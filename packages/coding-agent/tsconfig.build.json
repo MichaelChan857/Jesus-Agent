@@ -1,0 +1,19 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"paths": {
+			"@jesus/agent-core": ["../agent/dist/index.d.ts"],
+			"@jesus/agent-core/*": ["../agent/dist/*.d.ts"],
+			"@jesus/ai": ["../ai/dist/index.d.ts"],
+			"@jesus/ai/*": ["../ai/dist/*.d.ts", "../ai/dist/providers/*.d.ts"],
+			"@jesus/client": ["../client/dist/index.d.ts"],
+			"@jesus/protocol": ["../protocol/dist/index.d.ts"],
+			"@jesus/tui": ["../tui/dist/index.d.ts"],
+			"@jesus/tui/*": ["../tui/dist/*.d.ts", "../tui/dist/components/*.d.ts"]
+		},
+		"rootDir": "./src"
+	},
+	"include": ["src/**/*.ts", "src/**/*.d.ts"],
+	"exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,40 @@
+{
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"paths": {
+			"*": ["./*"],
+			"@jesus/telemetry": ["./packages/telemetry/src/index.ts"],
+			"@jesus/telemetry/testing": ["./packages/telemetry/src/testing/index.ts"],
+			"@jesus/ai": ["./packages/ai/src/index.ts"],
+			"@jesus/ai/oauth": ["./packages/ai/src/oauth.ts"],
+			"@jesus/ai/*": ["./packages/ai/src/*.ts", "./packages/ai/src/providers/*.ts"],
+			"@jesus/ai/dist/*": ["./packages/ai/src/*"],
+			"@jesus/agent-core": ["./packages/agent/src/index.ts"],
+			"@jesus/agent-core/node": ["./packages/agent/src/node.ts"],
+			"@jesus/agent-core/session/testing": [
+				"./packages/agent/src/harness/session/testing/index.ts"
+			],
+			"@jesus/agent-core/*": ["./packages/agent/src/*"],
+			"@earendil-works/pi-session-backends-backend-sqlite-node": ["./packages/session-backends/sqlite-node/src/index.ts"],
+			"@jesus/coding-agent": ["./packages/coding-agent/src/index.ts"],
+			"@jesus/coding-agent/hooks": ["./packages/coding-agent/src/core/hooks/index.ts"],
+			"@jesus/coding-agent/*": ["./packages/coding-agent/src/*"],
+			"@earendil-works/pi-protocol": ["./packages/protocol/src/index.ts"],
+			"@earendil-works/pi-protocol/*": ["./packages/protocol/src/*"],
+			"@earendil-works/pi-client": ["./packages/client/src/index.ts"],
+			"@earendil-works/pi-client/*": ["./packages/client/src/*"],
+			"@earendil-works/pi-server": ["./packages/server/src/index.ts"],
+			"@earendil-works/pi-server/*": ["./packages/server/src/*"],
+			"typebox": ["./node_modules/typebox"],
+			"@jesus/tui": ["./packages/tui/src/index.ts"],
+			"@jesus/tui/*": ["./packages/tui/src/*"],
+			"@jesus-agent/jesus-agent-agent-old": ["./packages/agent-old/src/index.ts"],
+			"@jesus-agent/jesus-agent-agent-old/*": ["./packages/agent-old/src/*"]
+		}
+	},
+	"include": ["packages/*/src/**/*", "packages/*/test/**/*", "packages/session-backends/*/src/**/*", "packages/session-backends/*/test/**/*", "packages/coding-agent/examples/**/*"],
+	"exclude": ["**/dist/**", "packages/coding-agent/examples/extensions/gondolin/**"]
+}

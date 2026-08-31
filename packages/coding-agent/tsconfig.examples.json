@@ -1,0 +1,16 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"paths": {
+			"@jesus/coding-agent": ["./src/index.ts"],
+			"@jesus/coding-agent/hooks": ["./src/core/hooks/index.ts"],
+			"@jesus/tui": ["../tui/src/index.ts"],
+			"@jesus/ai": ["../ai/src/index.ts"],
+			"typebox": ["../../node_modules/typebox"]
+		},
+		"skipLibCheck": true
+	},
+	"include": ["examples/**/*.ts"],
+	"exclude": ["node_modules", "dist"]
+}
