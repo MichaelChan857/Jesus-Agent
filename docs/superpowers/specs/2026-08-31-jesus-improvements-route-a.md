@@ -34,6 +34,16 @@ every commit produced by this work:
 - **I-4**: All five `check:*` scripts (`check:pinned-deps`,
   `check:shrinkwrap`, `check:install-lock:coding-agent`,
   `check:ts-imports`, `check:browser-smoke`) continue to pass.
+  > **Note added 2026-09-01:** baseline commit `41c21c7` already has
+  > `check:shrinkwrap` and `check:install-lock:coding-agent` failing
+  > because `scripts/generate-coding-agent-shrinkwrap.mjs` and
+  > `scripts/generate-coding-agent-install-lock.mjs` (earendil-works
+  > upstream) cannot resolve monorepo workspace `@jesus/*` link entries
+  > (`Cannot resolve @jesus/client from root. No matching lockfile
+  > entry found.`). This is **pre-existing**, not introduced by route A.
+  > The other 3 (`check:pinned-deps`, `check:ts-imports`,
+  > `check:browser-smoke`) gate route A; the failing 2 are tracked
+  > upstream and do not block route A section A/B/C tasks.
 - **I-5**: Release flow goes through `npm run release:patch` /
   `release:minor` (no custom publish path).
 - **I-6**: No new npm dependency is added without updating
