@@ -24,6 +24,7 @@ import * as minimax from "./providers/minimax.mjs";
 import * as minimaxCn from "./providers/minimax-cn.mjs";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const PROVIDERS = {
   anthropic,
@@ -31,7 +32,9 @@ const PROVIDERS = {
   minimax,
   "minimax-cn": minimaxCn,
 };
-const ROOT = new URL(".", import.meta.url).pathname;
+// fileURLToPath handles Windows quirks (new URL(".", import.meta.url).pathname
+// returns "/C:/..." on win32, which path.join then mangles into "\C:\...").
+const ROOT = fileURLToPath(new URL(".", import.meta.url));
 
 export function parseArgs(argv) {
   // argv is expected to be already-stripped (no node binary / script path).
@@ -55,23 +58,34 @@ export function parseArgs(argv) {
   };
 }
 
-async function runOne(provider, scenario, fauxOnly) {
+export async function runOne(providerName, scenario, fauxOnly, providerModOverride) {
+  // Faux-only mode short-circuits before any provider module is loaded.
   if (fauxOnly) {
     const r = await faux.send("synthetic", { model: "faux-1" });
-    return { status: "FAUX", provider, scenario: scenario.name, text: r.text };
+    return { status: "FAUX", provider: providerName, scenario: scenario.name, text: r.text };
   }
-  const providerMod = PROVIDERS[provider];
+  const providerMod = providerModOverride ?? PROVIDERS[providerName];
   if (!providerMod || !providerMod.isConfigured()) {
     const r = await faux.send("synthetic", { model: "faux-1" });
-    return { status: "FAUX", provider, scenario: scenario.name, text: r.text };
+    return { status: "FAUX", provider: providerName, scenario: scenario.name, text: r.text };
   }
+  // Per spec §2.A.3 the scenario's run(providerMod) is the source of truth:
+  // it calls providerMod.send(), asserts on response shape, and throws on
+  // failure. We own the timeout + lifecycle; the scenario owns the assertion.
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), scenario.timeoutMs ?? 30000);
   try {
-    const r = await providerMod.send(`scenario:${scenario.name}`, {
-      signal: controller.signal,
-    });
-    return { status: "PASS", provider, scenario: scenario.name, text: r.text };
+    // Inject the AbortSignal into providerOpts so scenarios can honor it.
+    const augmented = { ...providerMod, _signal: controller.signal };
+    await scenario.run(augmented);
+    return { status: "PASS", provider: providerName, scenario: scenario.name };
+  } catch (e) {
+    return {
+      status: "FAIL",
+      provider: providerName,
+      scenario: scenario.name,
+      error: e?.message ?? String(e),
+    };
   } finally {
     clearTimeout(t);
   }
