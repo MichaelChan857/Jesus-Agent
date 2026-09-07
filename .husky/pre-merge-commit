@@ -1,0 +1,5 @@
+#!/bin/sh
+# Pre-merge-commit hook: warn-only on cross-session files per spec §3.B.5.
+# `|| true` makes WARN non-fatal; we only log to console + .jesus/sessions/merge-warnings.log
+# (see scripts/check-session-isolation.mjs).
+node scripts/check-session-isolation.mjs --mode=merge || true

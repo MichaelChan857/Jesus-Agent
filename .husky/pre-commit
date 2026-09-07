@@ -42,4 +42,8 @@ for file in $STAGED_FILES; do
   fi
 done
 
+# Session-isolation gate: hard-stop if this commit would clobber files
+# owned by another registered jesus-agent session. See spec §3.B.4.
+node scripts/check-session-isolation.mjs --mode=commit
+
 echo "✅ All pre-commit checks passed!"
