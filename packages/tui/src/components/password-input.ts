@@ -1,4 +1,4 @@
-import { Container } from "../tui.ts";
+import { Container, type Focusable } from "../tui.ts";
 import { Text } from "./text.ts";
 
 export interface PasswordInputOptions {
@@ -13,10 +13,11 @@ export interface PasswordInputOptions {
  * undo stacks. It is purpose-built for short secret entry where the
  * underlying value must never be rendered.
  */
-export class PasswordInputComponent extends Container {
+export class PasswordInputComponent extends Container implements Focusable {
 	private value: string = "";
 	public onSubmit?: (value: string) => void;
 	public onCancel?: () => void;
+	public focused: boolean = false;
 	private readonly options: PasswordInputOptions;
 
 	constructor(options: PasswordInputOptions = {}) {

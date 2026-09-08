@@ -52,4 +52,11 @@ describe("PasswordInputComponent", () => {
 		c.handleInput("escape");
 		assert.equal(fired, true);
 	});
+
+	it("exposes Focusable interface (focused property)", () => {
+		const c = new PasswordInputComponent();
+		assert.equal(c.focused, false);
+		c.focused = true;
+		assert.equal(c.focused, true);
+	});
 });
