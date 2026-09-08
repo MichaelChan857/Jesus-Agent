@@ -70,6 +70,32 @@ npm run check         # lint, format, and type-check
 ./jesus-test.sh       # run Jesus Agent from sources (from any directory)
 ```
 
+## Releasing
+
+Jesus Agent follows lockstep versioning: all packages share one version; every release updates all together. `patch` = fixes + additions, `minor` = breaking changes. No major releases.
+
+**Install (per release):**
+
+```bash
+npm install -g @jesus/coding-agent
+```
+
+**First-run wizard:** on first start with no settings, Jesus runs an interactive setup (theme + analytics opt-in). Re-run anytime with `pi --setup-llm` to pick LLM provider, model, and API key.
+
+**To cut a new release (maintainers):**
+
+1. Update `CHANGELOG.md` files under each package's `## [Unreleased]` section (run `/cl` first if not already done).
+2. Bump versions and run checks:
+
+   ```bash
+   PI_ALLOW_LOCKFILE_CHANGE=1 npm_config_min_release_age=0 npm run release:patch   # fixes + additions
+   PI_ALLOW_LOCKFILE_CHANGE=1 npm_config_min_release_age=0 npm run release:minor   # breaking changes
+   ```
+
+3. CI verifies and announces the npm release: pushing the `vX.Y.Z` tag triggers `.github/workflows/build-binaries.yml`. The `publish-npm` job uses npm trusted publishing through GitHub Actions OIDC. After publishing, `announce-pi-dev-release` verifies every public workspace package resolves at the exact release version and writes the verified marker to R2. `jesus.dev/api/latest-version` reads that marker.
+
+See `AGENTS.md §Releasing` for the full release process (manual local smoke, lockfile review, fail-recovery).
+
 ## Supply-chain hardening
 
 The build treats npm dependency changes as reviewed code changes.
