@@ -173,7 +173,7 @@ export class SetupLlmComponent extends Container {
 		this.addChild(new Spacer(1));
 		const input = new PasswordInputComponent({ placeholder: "press Enter to skip" });
 		input.onSubmit = (value: string) => {
-			this.options.settingsManager.setProviderKey(this.selectedProvider, value);
+			void this.options.settingsManager.setProviderKey(this.selectedProvider, value);
 			this.options.settingsManager.setDefaultModelAndProvider(this.selectedProvider, this.selectedModel);
 			void this.options.settingsManager.flush?.();
 			this.step = "done";
