@@ -54,6 +54,8 @@ import {
 } from "./provider-composer.ts";
 import { withRemoteCatalog } from "./remote-catalog-provider.ts";
 import { RuntimeCredentials } from "./runtime-credentials.ts";
+import { SettingsManager } from "./settings-manager.ts";
+import { withStoredKeys } from "./with-stored-keys-provider.ts";
 
 interface ModelRuntimeSnapshot {
 	all: readonly Model<Api>[];
@@ -79,6 +81,8 @@ export interface CreateModelRuntimeOptions {
 	signal?: AbortSignal;
 	/** Skip initial catalog and availability refresh. Static models remain available. */
 	refreshOnCreate?: boolean;
+	/** SettingsManager to consult for providerKeys fallback during auth. */
+	settingsManager?: import("./settings-manager.ts").SettingsManager;
 }
 
 export interface ModelRuntimeAuthOverrides extends AuthOperationOptions {
@@ -180,13 +184,12 @@ export class ModelRuntime implements Models {
 				? new FileModelsStore(options.modelsStorePath ?? join(dirname(modelsPath), "models-store.json"))
 				: new InMemoryCodingAgentModelsStore());
 		const builtinModelDataGeneratedAt = builtinProviderCatalog.getBuiltinModelDataGeneratedAt();
-		const providers = builtinProviderCatalog
-			.builtinProviders()
-			.map((provider) =>
-				provider.id === "radius"
-					? provider
-					: withRemoteCatalog(provider, options.catalogBaseUrl, builtinModelDataGeneratedAt),
-			);
+		const settingsManager = options.settingsManager ?? SettingsManager.create(process.cwd());
+		const providers = builtinProviderCatalog.builtinProviders().map((provider) => {
+			if (provider.id === "radius") return provider;
+			const remote = withRemoteCatalog(provider, options.catalogBaseUrl, builtinModelDataGeneratedAt);
+			return withStoredKeys(remote, settingsManager);
+		});
 		const runtime = new ModelRuntime(
 			credentials,
 			config,
