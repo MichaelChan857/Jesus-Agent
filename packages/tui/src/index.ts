@@ -18,6 +18,7 @@ export { Image, type ImageOptions, type ImageTheme } from "./components/image.ts
 export { Input } from "./components/input.ts";
 export { Loader, type LoaderIndicatorOptions } from "./components/loader.ts";
 export { type DefaultTextStyle, Markdown, type MarkdownOptions, type MarkdownTheme } from "./components/markdown.ts";
+export { PasswordInputComponent, type PasswordInputOptions } from "./components/password-input.ts";
 export {
 	ScrollView,
 	type ScrollViewOptions,
