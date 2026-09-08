@@ -17,7 +17,9 @@ function makeProvider(id: string, originalResolve: (input: unknown) => Promise<u
 	return { id, name: id, auth: { apiKey: { resolve: originalResolve } } };
 }
 
-function makeSettings(getProviderKey: (id: string) => string | undefined): SettingsManager {
+function makeSettings(
+	getProviderKey: (id: string) => Promise<string | undefined> | string | undefined,
+): SettingsManager {
 	return { getProviderKey } as unknown as SettingsManager;
 }
 
