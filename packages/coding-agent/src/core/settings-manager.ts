@@ -9,6 +9,7 @@ import { CONFIG_DIR_NAME, getAgentDir, getEnvWithFallback } from "../config.ts";
 import { normalizePath, resolvePath } from "../utils/paths.ts";
 import { stripBom } from "../utils/text.ts";
 import { DEFAULT_HTTP_IDLE_TIMEOUT_MS, parseHttpIdleTimeoutMs } from "./http-dispatcher.ts";
+import { createSecretStore, type SecretStore } from "./secret-store.ts";
 
 export interface CompactionSettings {
 	enabled?: boolean; // default: true
@@ -95,9 +96,6 @@ export interface Settings {
 	lastChangelogVersion?: string;
 	defaultProvider?: string;
 	defaultModel?: string;
-	/** Per-provider API keys stored as plaintext (MVP). Provider adapter
-	 * fallback wiring is a follow-up; PI_<PROVIDER>_API_KEY env still wins. */
-	providerKeys?: Record<string, string>;
 	defaultThinkingLevel?: ThinkingLevel;
 	modelThinkingLevels?: Record<string, ThinkingLevel>; // per-model default thinking level overrides keyed by "provider/modelId"
 	transport?: TransportSetting; // default: "auto"
@@ -191,6 +189,8 @@ export type SettingsScope = "global" | "project";
 
 export interface SettingsManagerCreateOptions {
 	projectTrusted?: boolean;
+	/** Override the default SecretStore (used for testing). */
+	secretStore?: SecretStore;
 }
 
 export interface SettingsStorage {
@@ -314,6 +314,7 @@ export class SettingsManager {
 	private writeQueue: Promise<void> = Promise.resolve();
 	private errors: SettingsError[];
 	private settingsPaths: SettingsPaths;
+	private readonly secretStore: SecretStore;
 
 	private constructor(
 		storage: SettingsStorage,
@@ -324,6 +325,7 @@ export class SettingsManager {
 		initialErrors: SettingsError[] = [],
 		projectTrusted = true,
 		settingsPaths: SettingsPaths = {},
+		secretStore: SecretStore = createSecretStore(),
 	) {
 		this.storage = storage;
 		this.globalSettings = initialGlobal;
@@ -333,6 +335,7 @@ export class SettingsManager {
 		this.projectSettingsLoadError = projectLoadError;
 		this.errors = [...initialErrors];
 		this.settingsPaths = settingsPaths;
+		this.secretStore = secretStore;
 		this.settings = deepMergeSettings(this.globalSettings, this.projectSettings);
 	}
 
@@ -345,10 +348,15 @@ export class SettingsManager {
 		const resolvedCwd = resolvePath(cwd);
 		const resolvedAgentDir = resolvePath(agentDir);
 		const storage = new FileSettingsStorage(resolvedCwd, resolvedAgentDir);
-		return SettingsManager.fromStorageWithPaths(storage, options, {
-			global: join(resolvedAgentDir, "settings.json"),
-			project: join(resolvedCwd, CONFIG_DIR_NAME, "settings.json"),
-		});
+		return SettingsManager.fromStorageWithPaths(
+			storage,
+			options,
+			{
+				global: join(resolvedAgentDir, "settings.json"),
+				project: join(resolvedCwd, CONFIG_DIR_NAME, "settings.json"),
+			},
+			options.secretStore ?? createSecretStore(),
+		);
 	}
 
 	/** Create a SettingsManager from an arbitrary storage backend */
@@ -361,6 +369,7 @@ export class SettingsManager {
 		storage: SettingsStorage,
 		options: SettingsManagerCreateOptions,
 		settingsPaths: SettingsPaths = {},
+		secretStore: SecretStore = createSecretStore(),
 	): SettingsManager {
 		const projectTrusted = options.projectTrusted ?? true;
 		const globalLoad = SettingsManager.tryLoadFromStorage(storage, "global");
@@ -382,6 +391,7 @@ export class SettingsManager {
 			initialErrors,
 			projectTrusted,
 			settingsPaths,
+			secretStore,
 		);
 	}
 
@@ -745,17 +755,12 @@ export class SettingsManager {
 		this.save();
 	}
 
-	setProviderKey(provider: string, apiKey: string): void {
-		this.globalSettings.providerKeys = {
-			...(this.globalSettings.providerKeys ?? {}),
-			[provider]: apiKey,
-		};
-		this.markModified("providerKeys");
-		this.save();
+	async setProviderKey(provider: string, apiKey: string): Promise<void> {
+		await this.secretStore.set(provider, "providerKey", apiKey);
 	}
 
-	getProviderKey(provider: string): string | undefined {
-		return this.globalSettings.providerKeys?.[provider];
+	async getProviderKey(provider: string): Promise<string | undefined> {
+		return this.secretStore.get(provider, "providerKey");
 	}
 
 	getSteeringMode(): "all" | "one-at-a-time" {
