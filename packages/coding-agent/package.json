@@ -5,7 +5,7 @@
 	"type": "module",
 	"appConfig": {
 		"name": "jesus",
-		"configDir": "jesus"
+		"configDir": ".jesus"
 	},
 	"bin": {
 		"jesus": "dist/bundle/cli.js"
