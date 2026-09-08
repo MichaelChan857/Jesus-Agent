@@ -30,7 +30,7 @@ export function withStoredKeys(provider: Provider, settingsManager: SettingsMana
 					if (result?.auth && "apiKey" in result.auth && result.auth.apiKey) {
 						return result;
 					}
-					const stored = settingsManager.getProviderKey(provider.id);
+					const stored = await settingsManager.getProviderKey(provider.id);
 					if (stored) {
 						return {
 							auth: { apiKey: stored },
