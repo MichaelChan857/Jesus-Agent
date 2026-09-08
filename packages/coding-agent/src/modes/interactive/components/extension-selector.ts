@@ -18,10 +18,13 @@ export interface ExtensionSelectorOptions {
 export class ExtensionSelectorComponent extends Container {
 	private options: string[];
 	private selectedIndex = 0;
+	private scrollOffset = 0;
+	private readonly maxVisibleItems = 12;
 	private listContainer: Container;
 	private onSelectCallback: (option: string) => void;
 	private onCancelCallback: () => void;
 	private titleText: Text;
+	private indicatorText: Text;
 	private baseTitle: string;
 	private countdown: CountdownTimer | undefined;
 	private onToggleToolsExpanded: (() => void) | undefined;
@@ -46,6 +49,8 @@ export class ExtensionSelectorComponent extends Container {
 
 		this.titleText = new Text(theme.fg("accent", theme.bold(title)), 1, 0);
 		this.addChild(this.titleText);
+		this.indicatorText = new Text("", 1, 0);
+		this.addChild(this.indicatorText);
 		this.addChild(new Spacer(1));
 
 		if (opts?.timeout && opts.timeout > 0 && opts.tui) {
@@ -79,13 +84,22 @@ export class ExtensionSelectorComponent extends Container {
 
 	private updateList(): void {
 		this.listContainer.clear();
-		for (let i = 0; i < this.options.length; i++) {
+		for (let i = this.scrollOffset; i < this.visibleEnd; i++) {
 			const isSelected = i === this.selectedIndex;
 			const text = isSelected
 				? theme.fg("accent", "→ ") + theme.fg("accent", this.options[i])
 				: `  ${theme.fg("text", this.options[i])}`;
 			this.listContainer.addChild(new Text(text, 1, 0));
 		}
+		const total = this.options.length;
+		if (total === 0) {
+			this.indicatorText.setText(theme.fg("muted", "no items"));
+			return;
+		}
+		const start = this.scrollOffset + 1;
+		const end = this.visibleEnd;
+		const cursor = this.selectedIndex + 1;
+		this.indicatorText.setText(theme.fg("muted", `showing ${start}-${end} of ${total} (cursor at ${cursor})`));
 	}
 
 	handleInput(keyData: string): void {
@@ -94,9 +108,20 @@ export class ExtensionSelectorComponent extends Container {
 			this.onToggleToolsExpanded?.();
 		} else if (kb.matches(keyData, "tui.select.up") || keyData === "k") {
 			this.selectedIndex = Math.max(0, this.selectedIndex - 1);
+			this.scrollToKeepSelectedVisible();
 			this.updateList();
 		} else if (kb.matches(keyData, "tui.select.down") || keyData === "j") {
 			this.selectedIndex = Math.min(this.options.length - 1, this.selectedIndex + 1);
+			this.scrollToKeepSelectedVisible();
+			this.updateList();
+		} else if (keyData === "pageUp") {
+			this.scrollOffset = Math.max(0, this.scrollOffset - this.maxVisibleItems);
+			this.selectedIndex = Math.max(0, this.selectedIndex - this.maxVisibleItems);
+			this.updateList();
+		} else if (keyData === "pageDown") {
+			const maxOffset = Math.max(0, this.options.length - this.maxVisibleItems);
+			this.scrollOffset = Math.min(maxOffset, this.scrollOffset + this.maxVisibleItems);
+			this.selectedIndex = Math.min(this.options.length - 1, this.selectedIndex + this.maxVisibleItems);
 			this.updateList();
 		} else if (kb.matches(keyData, "tui.select.confirm") || keyData === "\n") {
 			const selected = this.options[this.selectedIndex];
@@ -108,5 +133,19 @@ export class ExtensionSelectorComponent extends Container {
 
 	dispose(): void {
 		this.countdown?.dispose();
+	}
+
+	private get visibleEnd(): number {
+		return Math.min(this.scrollOffset + this.maxVisibleItems, this.options.length);
+	}
+
+	private scrollToKeepSelectedVisible(): void {
+		if (this.selectedIndex < this.scrollOffset) {
+			this.scrollOffset = this.selectedIndex;
+		} else if (this.selectedIndex >= this.visibleEnd) {
+			this.scrollOffset = this.selectedIndex - this.maxVisibleItems + 1;
+			const maxOffset = Math.max(0, this.options.length - this.maxVisibleItems);
+			if (this.scrollOffset > maxOffset) this.scrollOffset = maxOffset;
+		}
 	}
 }
