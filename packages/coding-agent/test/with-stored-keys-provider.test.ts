@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { withStoredKeys } from "../src/core/with-stored-keys-provider.ts";
 import type { SettingsManager } from "../src/core/settings-manager.ts";
+import { withStoredKeys } from "../src/core/with-stored-keys-provider.ts";
 
 // Minimal Provider stub — only the fields withStoredKeys touches.
 type StubProvider = {
