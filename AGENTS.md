@@ -130,6 +130,28 @@ Attribution:
 
 1. **Update CHANGELOGs**: ask the user whether they ran the `/cl` prompt on the latest commit on `main`. If not, they must run `/cl` first to audit and update each package's `[Unreleased]` section before releasing.
 
+1.5. **Pre-release smoke (scripted)**: as a faster alternative to the manual
+    step 2 commands, run:
+
+    ```bash
+    npm run release:smoke
+    ```
+
+    This invokes `scripts/release-smoke.mjs`, which auto-runs
+    `scripts/local-release.mjs --out <dir> --force` when the artifact
+    directory is missing, then spawns the 8-cell smoke matrix defined in
+    `docs/superpowers/specs/2026-08-31-jesus-improvements-route-a.md`
+    §4.C (Node + Bun × `--help` / `--version` / `--list-models` / `-p "ok"`).
+
+    - Bun cells are SKIP (not FAIL) if `bun` is not installed.
+    - Escape hatch: `npm run release:smoke -- --skip-real-provider` skips
+      the `-p "ok"` real-provider call (keeps the 6 binary/CLI cells).
+    - Hard-fails on the first failing `--help` / `--version` / `--list-models`.
+    - `-p "ok"` issues one real provider request per release by default.
+
+    The manual step 2 below remains required for interactive TUI startup
+    testing (the scripted smoke does not cover tmux interactive sessions).
+
 2. **Local smoke test**: build an unpublished release and smoke test from outside the repo (so it can't resolve workspace files):
    ```bash
    npm run release:local -- --out /tmp/pi-local-release --force

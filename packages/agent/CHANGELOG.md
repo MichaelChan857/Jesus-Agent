@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added `npm run release:smoke` scripted smoke matrix (Node + Bun × `--help` / `--version` / `--list-models` / `-p "ok"`) that auto-invokes `scripts/local-release.mjs` when the artifact directory is missing. Wired into `prepublishOnly` after `check`. Added `.github/workflows/release-smoke.yml` (PR + main + tag triggers; secrets-gated real-provider call). See `docs/superpowers/specs/2026-09-08-release-smoke-closure-design.md`.
+
 ## [0.84.4] - 2026-08-28
 
 ### Breaking Changes
