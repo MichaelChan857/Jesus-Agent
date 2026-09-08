@@ -597,6 +597,36 @@ describe("SettingsManager", () => {
 		});
 	});
 
+	describe("providerKeys", () => {
+		it("setProviderKey persists and getProviderKey returns the same value", async () => {
+			const settingsPath = join(agentDir, "settings.json");
+			writeFileSync(settingsPath, JSON.stringify({ theme: "dark" }));
+			const manager = SettingsManager.create(projectDir, agentDir);
+			manager.setProviderKey("anthropic", "sk-test-abc");
+			await manager.flush();
+			const onDisk = JSON.parse(readFileSync(settingsPath, "utf8"));
+			expect(onDisk.providerKeys?.anthropic).toBe("sk-test-abc");
+			expect(manager.getProviderKey("anthropic")).toBe("sk-test-abc");
+		});
+
+		it("setProviderKey merges with existing keys without dropping them", async () => {
+			const settingsPath = join(agentDir, "settings.json");
+			writeFileSync(settingsPath, JSON.stringify({ theme: "dark" }));
+			const manager = SettingsManager.create(projectDir, agentDir);
+			manager.setProviderKey("anthropic", "sk-a");
+			manager.setProviderKey("openai", "sk-o");
+			await manager.flush();
+			expect(manager.getProviderKey("anthropic")).toBe("sk-a");
+			expect(manager.getProviderKey("openai")).toBe("sk-o");
+		});
+
+		it("getProviderKey returns undefined for unknown provider", () => {
+			writeFileSync(join(agentDir, "settings.json"), JSON.stringify({ theme: "dark" }));
+			const manager = SettingsManager.create(projectDir, agentDir);
+			expect(manager.getProviderKey("anthropic")).toBeUndefined();
+		});
+	});
+
 	describe("getShellPath", () => {
 		it("should return undefined when not set", () => {
 			writeFileSync(join(agentDir, "settings.json"), JSON.stringify({ theme: "dark" }));

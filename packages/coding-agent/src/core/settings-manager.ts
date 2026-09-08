@@ -95,6 +95,9 @@ export interface Settings {
 	lastChangelogVersion?: string;
 	defaultProvider?: string;
 	defaultModel?: string;
+	/** Per-provider API keys stored as plaintext (MVP). Provider adapter
+	 * fallback wiring is a follow-up; PI_<PROVIDER>_API_KEY env still wins. */
+	providerKeys?: Record<string, string>;
 	defaultThinkingLevel?: ThinkingLevel;
 	modelThinkingLevels?: Record<string, ThinkingLevel>; // per-model default thinking level overrides keyed by "provider/modelId"
 	transport?: TransportSetting; // default: "auto"
@@ -740,6 +743,19 @@ export class SettingsManager {
 		this.markModified("defaultProvider");
 		this.markModified("defaultModel");
 		this.save();
+	}
+
+	setProviderKey(provider: string, apiKey: string): void {
+		this.globalSettings.providerKeys = {
+			...(this.globalSettings.providerKeys ?? {}),
+			[provider]: apiKey,
+		};
+		this.markModified("providerKeys");
+		this.save();
+	}
+
+	getProviderKey(provider: string): string | undefined {
+		return this.globalSettings.providerKeys?.[provider];
 	}
 
 	getSteeringMode(): "all" | "one-at-a-time" {
