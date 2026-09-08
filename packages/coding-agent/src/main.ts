@@ -35,6 +35,7 @@ import { buildInitialMessage } from "./cli/initial-message.ts";
 import { listModels } from "./cli/list-models.ts";
 import { createProjectTrustContext } from "./cli/project-trust.ts";
 import { selectSession } from "./cli/session-picker.ts";
+import { showSetupLlmWizard } from "./cli/setup-llm.ts";
 import { shouldRunFirstTimeSetup, showFirstTimeSetup, showStartupSelector } from "./cli/startup-ui.ts";
 import {
 	APP_NAME,
@@ -732,6 +733,13 @@ export async function main(args: string[], options?: MainOptions) {
 
 	const startupSettingsManager = SettingsManager.create(cwd, agentDir);
 	const startupSettingsDiagnostics = collectSettingsDiagnostics(startupSettingsManager);
+
+	// --setup-llm: run interactive LLM provider/model/key wizard and exit.
+	// Opt-in only (does not touch default startup flow).
+	if (parsed.setupLlm) {
+		await showSetupLlmWizard(startupSettingsManager);
+		return;
+	}
 
 	// Experimental first-time setup: theme choice and analytics opt-in.
 	// Runs before any runtime services are created so the chosen settings apply everywhere.
