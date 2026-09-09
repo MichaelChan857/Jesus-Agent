@@ -1,4 +1,4 @@
-import { ProcessTerminal, TUI } from "@jesus/tui";
+import { ProcessTerminal, TuiMainScreen } from "@jesus/tui";
 import type { SettingsManager } from "../core/settings-manager.ts";
 import { SetupLlmComponent } from "../modes/interactive/components/setup-llm.ts";
 import { initTheme } from "../modes/interactive/theme/theme.ts";
@@ -13,7 +13,7 @@ import { initTheme } from "../modes/interactive/theme/theme.ts";
 export async function showSetupLlmWizard(settingsManager: SettingsManager): Promise<void> {
 	await initTheme();
 	const terminal = new ProcessTerminal();
-	const ui = new TUI(terminal);
+	const ui = new TuiMainScreen(terminal, settingsManager.getShowHardwareCursor?.() ?? true);
 	const component = new SetupLlmComponent({
 		tui: ui,
 		settingsManager,

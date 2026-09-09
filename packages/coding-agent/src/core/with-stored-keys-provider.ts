@@ -19,12 +19,14 @@ export function withStoredKeys(provider: Provider, settingsManager: SettingsMana
 	if (!originalResolve) {
 		return provider;
 	}
+	const originalApiKey = provider.auth!.apiKey!;
 	return {
 		...provider,
 		auth: {
 			...provider.auth,
 			apiKey: {
-				...provider.auth.apiKey,
+				...originalApiKey,
+				name: originalApiKey.name ?? "API key",
 				resolve: async (args) => {
 					const result = await originalResolve(args);
 					if (result?.auth && "apiKey" in result.auth && result.auth.apiKey) {

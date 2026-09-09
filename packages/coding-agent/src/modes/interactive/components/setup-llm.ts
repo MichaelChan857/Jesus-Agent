@@ -81,8 +81,8 @@ export class SetupLlmComponent extends Container {
 	private renderBannerStep(): void {
 		this.addChild(
 			new Text(
-				rawKeyHint("Enter") +
-					" " +
+				rawKeyHint("Enter", "continue") +
+					"  " +
 					keyHint("tui.select.confirm", "continue") +
 					"  " +
 					keyHint("tui.select.cancel", "cancel"),
