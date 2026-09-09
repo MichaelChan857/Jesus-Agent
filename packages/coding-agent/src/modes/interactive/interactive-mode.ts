@@ -225,6 +225,8 @@ function isCompactionCostNotice(item: RenderSessionItem): item is CompactionCost
 	return "type" in item && item.type === "compaction_cost";
 }
 
+const COMPACT_LIST_COLLAPSE_THRESHOLD = 10;
+
 const DEAD_TERMINAL_ERROR_CODES = new Set(["EIO", "EPIPE", "ENOTCONN"]);
 
 function isDeadTerminalError(error: unknown): boolean {
@@ -1764,6 +1766,9 @@ export class InteractiveMode {
 			const labels = items.map((item) => item.trim()).filter((item) => item.length > 0);
 			if (options?.sort !== false) {
 				labels.sort((a, b) => a.localeCompare(b));
+			}
+			if (labels.length > COMPACT_LIST_COLLAPSE_THRESHOLD) {
+				return theme.fg("dim", `  ${labels.length} items (Ctrl+O to expand)`);
 			}
 			return theme.fg("dim", `  ${labels.join(", ")}`);
 		};
