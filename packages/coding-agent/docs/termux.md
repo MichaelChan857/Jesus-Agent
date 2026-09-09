@@ -16,14 +16,14 @@ pkg update && pkg upgrade
 # Install dependencies
 pkg install nodejs termux-api git
 
-# Install pi
+# Install jesus
 npm install -g --ignore-scripts @jesus/coding-agent
 
 # Create config directory
 mkdir -p ~/.jesus/agent
 
-# Run pi
-pi
+# Run jesus
+jesus
 ```
 
 ## Clipboard Support

@@ -9,9 +9,9 @@ import type { ExtensionAPI } from "@jesus/coding-agent";
 import ms from "ms";
 import { Type } from "typebox";
 
-export default function (pi: ExtensionAPI) {
+export default function (jesus: ExtensionAPI) {
 	// Register a tool that uses ms
-	pi.registerTool({
+	jesus.registerTool({
 		name: "parse_duration",
 		label: "Parse Duration",
 		description: "Parse a human-readable duration string (e.g., '2 days', '1h', '5m') to milliseconds",

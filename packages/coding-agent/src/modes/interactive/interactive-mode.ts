@@ -458,7 +458,7 @@ export class InteractiveMode {
 	private workingMessage: string | undefined = undefined;
 	private workingVisible = true;
 	private workingIndicatorOptions: WorkingIndicatorOptions | undefined = undefined;
-	private readonly defaultWorkingMessage = "Working...";
+	private readonly defaultWorkingMessage = "Reasoning...";
 	private readonly defaultHiddenThinkingLabel = "Thinking...";
 	private hiddenThinkingLabel = this.defaultHiddenThinkingLabel;
 
@@ -3011,7 +3011,7 @@ export class InteractiveMode {
 			if (image) {
 				const tmpDir = os.tmpdir();
 				const ext = extensionForImageMimeType(image.mimeType) ?? "png";
-				const fileName = `pi-clipboard-${crypto.randomUUID()}.${ext}`;
+				const fileName = `jesus-clipboard-${crypto.randomUUID()}.${ext}`;
 				const filePath = path.join(tmpDir, fileName);
 				fs.writeFileSync(filePath, Buffer.from(image.bytes));
 

@@ -14,7 +14,7 @@ Where `<path>` is the working directory with `/` replaced by `-`.
 
 Sessions can be removed by deleting their `.jsonl` files under `~/.jesus/agent/sessions/`.
 
-Pi also supports deleting sessions interactively from `/resume` (select a session and press `Ctrl+D`, then confirm). When available, pi uses the `trash` CLI to avoid permanent deletion.
+Pi also supports deleting sessions interactively from `/resume` (select a session and press `Ctrl+D`, then confirm). When available, jesus uses the `trash` CLI to avoid permanent deletion.
 
 ## Session Version
 
@@ -117,7 +117,7 @@ interface Usage {
 }
 ```
 
-The exported pi-ai `StopReason` type also includes `"pending"`, but that value is reserved for partial messages in streaming events. Terminal `done`/`error` messages replace it with a completion reason before pi persists the assistant message, so `"pending"` should never appear in session JSONL.
+The exported pi-ai `StopReason` type also includes `"pending"`, but that value is reserved for partial messages in streaming events. Terminal `done`/`error` messages replace it with a completion reason before jesus persists the assistant message, so `"pending"` should never appear in session JSONL.
 
 ### Extended Message Types (from pi-coding-agent)
 
@@ -268,7 +268,7 @@ Extension state persistence. Does NOT participate in LLM context.
 {"type":"custom","id":"h8i9j0k1","parentId":"g7h8i9j0","timestamp":"2024-12-03T14:20:00.000Z","customType":"my-extension","data":{"count":42}}
 ```
 
-Use `customType` to identify your extension's entries on reload. Interactive mode can render custom entries via `pi.registerEntryRenderer(customType, renderer)`, but they still do not participate in LLM context.
+Use `customType` to identify your extension's entries on reload. Interactive mode can render custom entries via `jesus.registerEntryRenderer(customType, renderer)`, but they still do not participate in LLM context.
 
 ### CustomMessageEntry
 
@@ -295,7 +295,7 @@ Set `label` to `undefined` to clear a label.
 
 ### SessionInfoEntry
 
-Session metadata (e.g., user-defined display name). Set via `/name`, `--name` / `-n`, or `pi.setSessionName()` in extensions.
+Session metadata (e.g., user-defined display name). Set via `/name`, `--name` / `-n`, or `jesus.setSessionName()` in extensions.
 
 ```json
 {"type":"session_info","id":"k1l2m3n4","parentId":"j0k1l2m3","timestamp":"2024-12-03T14:35:00.000Z","name":"Refactor auth module"}

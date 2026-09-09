@@ -73,8 +73,8 @@ function errorResult(
 	};
 }
 
-export default function questionnaire(pi: ExtensionAPI) {
-	pi.registerTool({
+export default function questionnaire(jesus: ExtensionAPI) {
+	jesus.registerTool({
 		name: "questionnaire",
 		label: "Questionnaire",
 		description:

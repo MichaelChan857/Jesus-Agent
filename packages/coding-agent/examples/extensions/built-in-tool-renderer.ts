@@ -22,19 +22,19 @@
  *   toggled the tool output open (via ctrl+e or clicking)
  *
  * Usage:
- *   pi -e ./built-in-tool-renderer.ts
+ *   jesus -e ./built-in-tool-renderer.ts
  */
 
 import type { BashToolDetails, EditToolDetails, ExtensionAPI, ReadToolDetails } from "@jesus/coding-agent";
 import { createBashTool, createEditTool, createReadTool, createWriteTool } from "@jesus/coding-agent";
 import { Text } from "@jesus/tui";
 
-export default function (pi: ExtensionAPI) {
+export default function (jesus: ExtensionAPI) {
 	const cwd = process.cwd();
 
 	// --- Read tool: show path and line count ---
 	const originalRead = createReadTool(cwd);
-	pi.registerTool({
+	jesus.registerTool({
 		name: "read",
 		label: "read",
 		description: originalRead.description,
@@ -93,7 +93,7 @@ export default function (pi: ExtensionAPI) {
 
 	// --- Bash tool: show command and exit code ---
 	const originalBash = createBashTool(cwd);
-	pi.registerTool({
+	jesus.registerTool({
 		name: "bash",
 		label: "bash",
 		description: originalBash.description,
@@ -152,7 +152,7 @@ export default function (pi: ExtensionAPI) {
 
 	// --- Edit tool: show path and diff stats ---
 	const originalEdit = createEditTool(cwd);
-	pi.registerTool({
+	jesus.registerTool({
 		name: "edit",
 		label: "edit",
 		description: originalEdit.description,
@@ -217,7 +217,7 @@ export default function (pi: ExtensionAPI) {
 
 	// --- Write tool: show path and size ---
 	const originalWrite = createWriteTool(cwd);
-	pi.registerTool({
+	jesus.registerTool({
 		name: "write",
 		label: "write",
 		description: originalWrite.description,

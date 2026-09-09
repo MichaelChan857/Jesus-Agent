@@ -1,18 +1,18 @@
 /**
  * Input Transform Example - demonstrates the `input` event for intercepting user input.
  *
- * Start pi with this extension:
- *   pi -e ./examples/extensions/input-transform.ts
+ * Start jesus with this extension:
+ *   jesus -e ./examples/extensions/input-transform.ts
  *
- * Then type these inside pi:
+ * Then type these inside jesus:
  *   ?quick What is TypeScript?  → "Respond briefly: What is TypeScript?"
  *   ping                        → "pong" (instant, no LLM)
  *   time                        → current time (instant, no LLM)
  */
 import type { ExtensionAPI } from "@jesus/coding-agent";
 
-export default function (pi: ExtensionAPI) {
-	pi.on("input", async (event, ctx) => {
+export default function (jesus: ExtensionAPI) {
+	jesus.on("input", async (event, ctx) => {
 		// Source-based logic: skip processing for extension-injected messages
 		if (event.source === "extension") {
 			return { action: "continue" };

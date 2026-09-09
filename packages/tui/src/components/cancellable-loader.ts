@@ -6,7 +6,7 @@ import { Loader } from "./loader.ts";
  * Extends Loader with an AbortSignal for cancelling async operations.
  *
  * @example
- * const loader = new CancellableLoader(tui, cyan, dim, "Working...");
+ * const loader = new CancellableLoader(tui, cyan, dim, "Reasoning...");
  * loader.onAbort = () => done(null);
  * doWork(loader.signal).then(done);
  */

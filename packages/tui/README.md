@@ -468,7 +468,7 @@ const loader = new CancellableLoader(
   tui,                              // TUI instance for render updates
   (s) => chalk.cyan(s),            // spinner color function
   (s) => chalk.gray(s),            // message color function
-  "Working..."                      // message
+  "Reasoning..."                      // message
 );
 loader.onAbort = () => done(null); // Called when user presses Escape
 doAsyncWork(loader.signal).then(done);

@@ -8,12 +8,12 @@
 import type { ExtensionAPI, ExtensionContext } from "@jesus/coding-agent";
 
 async function checkDirtyRepo(
-	pi: ExtensionAPI,
+	jesus: ExtensionAPI,
 	ctx: ExtensionContext,
 	action: string,
 ): Promise<{ cancel: boolean } | undefined> {
 	// Check for uncommitted changes
-	const { stdout, code } = await pi.exec("git", ["status", "--porcelain"]);
+	const { stdout, code } = await jesus.exec("git", ["status", "--porcelain"]);
 
 	if (code !== 0) {
 		// Not a git repo, allow the action
@@ -44,13 +44,13 @@ async function checkDirtyRepo(
 	}
 }
 
-export default function (pi: ExtensionAPI) {
-	pi.on("session_before_switch", async (event, ctx) => {
+export default function (jesus: ExtensionAPI) {
+	jesus.on("session_before_switch", async (event, ctx) => {
 		const action = event.reason === "new" ? "new session" : "switch session";
-		return checkDirtyRepo(pi, ctx, action);
+		return checkDirtyRepo(jesus, ctx, action);
 	});
 
-	pi.on("session_before_fork", async (_event, ctx) => {
-		return checkDirtyRepo(pi, ctx, "fork");
+	jesus.on("session_before_fork", async (_event, ctx) => {
+		return checkDirtyRepo(jesus, ctx, "fork");
 	});
 }

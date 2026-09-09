@@ -523,7 +523,7 @@ const bashToolConfig: ShellToolConfig = {
 	prompt: "$",
 	promptSnippet: bashToolSystemPromptContribution.snippet,
 	promptGuidelines: bashToolSystemPromptContribution.guidelines,
-	tempFilePrefix: "pi-bash",
+	tempFilePrefix: "jesus-bash",
 };
 
 export function createBashToolDefinition(

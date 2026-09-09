@@ -48,10 +48,10 @@ function notify(title: string, body: string): void {
 	}
 }
 
-export default function (pi: ExtensionAPI) {
+export default function (jesus: ExtensionAPI) {
 	// `agent_end` fires after each low-level run; Pi may still retry, compact,
 	// or continue with queued follow-ups. Notify only after the full run settles.
-	pi.on("agent_settled", async () => {
+	jesus.on("agent_settled", async () => {
 		notify("Pi", "Ready for input");
 	});
 }

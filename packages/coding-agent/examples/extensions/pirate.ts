@@ -5,18 +5,18 @@
  * change agent behavior based on extension state.
  *
  * Usage:
- * 1. Copy this file to ~/.pi/agent/extensions/ or your project's .pi/extensions/
+ * 1. Copy this file to ~/.jesus/agent/extensions/ or your project's .jesus/extensions/
  * 2. Use /pirate to toggle pirate mode
  * 3. When enabled, the agent will respond like a pirate
  */
 
 import type { ExtensionAPI } from "@jesus/coding-agent";
 
-export default function pirateExtension(pi: ExtensionAPI) {
+export default function pirateExtension(jesus: ExtensionAPI) {
 	let pirateMode = false;
 
 	// Register /pirate command to toggle pirate mode
-	pi.registerCommand("pirate", {
+	jesus.registerCommand("pirate", {
 		description: "Toggle pirate mode (agent speaks like a pirate)",
 		handler: async (_args, ctx) => {
 			pirateMode = !pirateMode;
@@ -25,7 +25,7 @@ export default function pirateExtension(pi: ExtensionAPI) {
 	});
 
 	// Append to system prompt when pirate mode is enabled
-	pi.on("before_agent_start", async (event) => {
+	jesus.on("before_agent_start", async (event) => {
 		if (pirateMode) {
 			return {
 				systemPrompt:

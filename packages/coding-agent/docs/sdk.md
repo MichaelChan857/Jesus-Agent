@@ -1,8 +1,8 @@
-> pi can help you use the SDK. Ask it to build an integration for your use case.
+> jesus can help you use the SDK. Ask it to build an integration for your use case.
 
 # SDK
 
-The SDK provides programmatic access to pi's agent capabilities. Use it to embed pi in other applications, build custom interfaces, or integrate with automated workflows.
+The SDK provides programmatic access to jesus's agent capabilities. Use it to embed jesus in other applications, build custom interfaces, or integrate with automated workflows.
 
 **Example use cases:**
 - Build a custom UI (web, desktop, mobile)
@@ -215,7 +215,7 @@ await session.prompt("After you're done, also check X", { streamingBehavior: "fo
 ```
 
 **Behavior:**
-- **Extension commands** (e.g., `/mycommand`): Execute immediately, even during streaming. They manage their own LLM interaction via `pi.sendMessage()`.
+- **Extension commands** (e.g., `/mycommand`): Execute immediately, even during streaming. They manage their own LLM interaction via `jesus.sendMessage()`.
 - **File-based prompt templates** (from `.md` files): Expanded to their content before sending or queueing.
 - **During streaming without `streamingBehavior`**: Throws an error. Use `steer()` or `followUp()` directly, or specify the option.
 - **`preflightResult(true)`**: Means the prompt was accepted, queued, or handled immediately.
@@ -602,9 +602,9 @@ const { session } = await createAgentSession({
 });
 ```
 
-Use `defineTool()` for standalone definitions and arrays like `customTools: [myTool]`. Inline `pi.registerTool({ ... })` already infers parameter types correctly.
+Use `defineTool()` for standalone definitions and arrays like `customTools: [myTool]`. Inline `jesus.registerTool({ ... })` already infers parameter types correctly.
 
-Custom tools passed via `customTools` are combined with extension-registered tools. Extensions loaded by the ResourceLoader can also register tools via `pi.registerTool()`.
+Custom tools passed via `customTools` are combined with extension-registered tools. Extensions loaded by the ResourceLoader can also register tools via `jesus.registerTool()`.
 
 If you pass `tools`, include each custom or extension tool name you want enabled, for example `tools: ["read", "bash", "my_tool"]`.
 
@@ -620,8 +620,8 @@ import { createAgentSession, DefaultResourceLoader } from "@jesus/coding-agent";
 const loader = new DefaultResourceLoader({
   additionalExtensionPaths: ["/path/to/my-extension.ts"],
   extensionFactories: [
-    (pi) => {
-      pi.on("agent_start", () => {
+    (jesus) => {
+      jesus.on("agent_start", () => {
         console.log("[Inline Extension] Agent starting");
       });
     },
@@ -641,8 +641,8 @@ import type { InlineExtension } from "@jesus/coding-agent";
 
 const myProvider: InlineExtension = {
   name: "my-provider",
-  factory: (pi) => {
-    pi.on("agent_start", () => {
+  factory: (jesus) => {
+    jesus.on("agent_start", () => {
       console.log("[my-provider] Agent starting");
     });
   },
@@ -655,7 +655,7 @@ const loader = new DefaultResourceLoader({
 
 This displays as `<inline:my-provider>` instead of `<inline:1>`. Bare factory functions are still accepted for backward compatibility.
 
-**Event Bus:** Extensions can communicate via `pi.events`. Pass a shared `eventBus` to `DefaultResourceLoader` if you need to emit or listen from outside:
+**Event Bus:** Extensions can communicate via `jesus.events`. Pass a shared `eventBus` to `DefaultResourceLoader` if you need to emit or listen from outside:
 
 ```typescript
 import { createEventBus, DefaultResourceLoader } from "@jesus/coding-agent";
@@ -1147,7 +1147,7 @@ See [RPC documentation](rpc.md) for the JSON protocol.
 For subprocess-based integration without building with the SDK, use the CLI directly:
 
 ```bash
-pi --mode rpc --no-session
+jesus --mode rpc --no-session
 ```
 
 See [RPC documentation](rpc.md) for the JSON protocol.

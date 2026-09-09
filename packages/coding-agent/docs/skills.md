@@ -1,4 +1,4 @@
-> pi can create skills. Ask it to build one for your use case.
+> jesus can create skills. Ask it to build one for your use case.
 
 # Skills
 
@@ -29,7 +29,7 @@ Pi loads skills from:
 - Project (only after the project is trusted):
   - `.jesus/skills/`
   - `.agents/skills/` in `cwd` and ancestor directories (up to git repo root, or filesystem root when not in a repo)
-- Packages: `skills/` directories or `pi.skills` entries in `package.json`
+- Packages: `skills/` directories or `jesus.skills` entries in `package.json`
 - Settings: `skills` array with files or directories
 - CLI: `--skill <path>` (repeatable, additive even with `--no-skills`)
 
@@ -64,7 +64,7 @@ For project-level Claude Code skills, add to `.jesus/settings.json`:
 
 ## How Skills Work
 
-1. At startup, pi scans skill locations and extracts names and descriptions
+1. At startup, jesus scans skill locations and extracts names and descriptions
 2. The system prompt includes available skills in XML format per the [specification](https://agentskills.io/integrate-skills)
 3. When a task matches, the agent uses `read` to load the full SKILL.md (models don't always do this; use prompting or `/skill:name` to force it)
 4. The agent follows the instructions, using relative paths to reference scripts and assets

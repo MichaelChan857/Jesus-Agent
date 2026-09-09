@@ -7,10 +7,10 @@
 
 import type { ExtensionAPI } from "@jesus/coding-agent";
 
-export default function (pi: ExtensionAPI) {
+export default function (jesus: ExtensionAPI) {
 	const protectedPaths = [".env", ".git/", "node_modules/"];
 
-	pi.on("tool_call", async (event, ctx) => {
+	jesus.on("tool_call", async (event, ctx) => {
 		if (event.toolName !== "write" && event.toolName !== "edit") {
 			return undefined;
 		}

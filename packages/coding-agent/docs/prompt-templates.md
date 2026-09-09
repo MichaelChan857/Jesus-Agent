@@ -1,4 +1,4 @@
-> pi can create prompt templates. Ask it to build one for your workflow.
+> jesus can create prompt templates. Ask it to build one for your workflow.
 
 # Prompt Templates
 
@@ -10,7 +10,7 @@ Pi loads prompt templates from:
 
 - Global: `~/.jesus/agent/prompts/*.md`
 - Project: `.jesus/prompts/*.md` (only after the project is trusted)
-- Packages: `prompts/` directories or `pi.prompts` entries in `package.json`
+- Packages: `prompts/` directories or `jesus.prompts` entries in `package.json`
 - Settings: `prompts` array with files or directories
 - CLI: `--prompt-template <path>` (repeatable)
 

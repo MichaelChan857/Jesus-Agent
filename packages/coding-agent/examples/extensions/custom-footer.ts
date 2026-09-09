@@ -12,10 +12,10 @@ import type { AssistantMessage } from "@jesus/ai";
 import type { ExtensionAPI } from "@jesus/coding-agent";
 import { truncateToWidth, visibleWidth } from "@jesus/tui";
 
-export default function (pi: ExtensionAPI) {
+export default function (jesus: ExtensionAPI) {
 	let enabled = false;
 
-	pi.registerCommand("footer", {
+	jesus.registerCommand("footer", {
 		description: "Toggle custom footer",
 		handler: async (_args, ctx) => {
 			enabled = !enabled;

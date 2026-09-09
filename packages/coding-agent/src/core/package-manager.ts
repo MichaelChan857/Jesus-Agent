@@ -1907,7 +1907,7 @@ export class DefaultPackageManager implements PackageManager {
 	}
 
 	private getGitUpdateMarkerPath(targetDir: string): string {
-		return join(dirname(targetDir), `.${basename(targetDir)}.pi-update-incomplete`);
+		return join(dirname(targetDir), `.${basename(targetDir)}.jesus-update-incomplete`);
 	}
 
 	private async cleanAndInstallGitDependencies(targetDir: string, markerPath: string): Promise<void> {
@@ -2465,7 +2465,7 @@ export class DefaultPackageManager implements PackageManager {
 			);
 		}
 
-		// User extensions from ~/.pi/agent/
+		// User extensions from ~/.jesus/agent/
 		addResources(
 			"extensions",
 			collectAutoExtensionEntries(userDirs.extensions),
@@ -2474,7 +2474,7 @@ export class DefaultPackageManager implements PackageManager {
 			globalBaseDir,
 		);
 
-		// User skills from ~/.pi/agent/
+		// User skills from ~/.jesus/agent/
 		addResources(
 			"skills",
 			collectAutoSkillEntries(userDirs.skills, "pi"),

@@ -10,10 +10,10 @@
  * via `tool_call` input mutation without replacing the tool.
  *
  * Config files (merged, project takes precedence):
- * - ~/.pi/agent/extensions/sandbox.json (global)
- * - <cwd>/.pi/sandbox.json (project-local)
+ * - ~/.jesus/agent/extensions/sandbox.json (global)
+ * - <cwd>/.jesus/sandbox.json (project-local)
  *
- * Example .pi/sandbox.json:
+ * Example .jesus/sandbox.json:
  * ```json
  * {
  *   "enabled": true,
@@ -30,13 +30,13 @@
  * ```
  *
  * Usage:
- * - `pi -e ./sandbox` - sandbox enabled with default/config settings
- * - `pi -e ./sandbox --no-sandbox` - disable sandboxing
+ * - `jesus -e ./sandbox` - sandbox enabled with default/config settings
+ * - `jesus -e ./sandbox --no-sandbox` - disable sandboxing
  * - `/sandbox` - show current sandbox configuration
  *
  * Setup:
- * 1. Copy sandbox/ directory to ~/.pi/agent/extensions/
- * 2. Run `npm install` in ~/.pi/agent/extensions/sandbox/
+ * 1. Copy sandbox/ directory to ~/.jesus/agent/extensions/
+ * 2. Run `npm install` in ~/.jesus/agent/extensions/sandbox/
  *
  * Linux also requires: bubblewrap, socat, ripgrep
  */
@@ -198,8 +198,8 @@ function createSandboxedBashOps(): BashOperations {
 	};
 }
 
-export default function (pi: ExtensionAPI) {
-	pi.registerFlag("no-sandbox", {
+export default function (jesus: ExtensionAPI) {
+	jesus.registerFlag("no-sandbox", {
 		description: "Disable OS-level sandboxing for bash commands",
 		type: "boolean",
 		default: false,
@@ -211,7 +211,7 @@ export default function (pi: ExtensionAPI) {
 	let sandboxEnabled = false;
 	let sandboxInitialized = false;
 
-	pi.registerTool({
+	jesus.registerTool({
 		...localBash,
 		label: "bash (sandboxed)",
 		async execute(id, params, signal, onUpdate, _ctx) {
@@ -226,13 +226,13 @@ export default function (pi: ExtensionAPI) {
 		},
 	});
 
-	pi.on("user_bash", () => {
+	jesus.on("user_bash", () => {
 		if (!sandboxEnabled || !sandboxInitialized) return;
 		return { operations: createSandboxedBashOps() };
 	});
 
-	pi.on("session_start", async (_event, ctx) => {
-		const noSandbox = pi.getFlag("no-sandbox") as boolean;
+	jesus.on("session_start", async (_event, ctx) => {
+		const noSandbox = jesus.getFlag("no-sandbox") as boolean;
 
 		if (noSandbox) {
 			sandboxEnabled = false;
@@ -284,7 +284,7 @@ export default function (pi: ExtensionAPI) {
 		}
 	});
 
-	pi.on("session_shutdown", async () => {
+	jesus.on("session_shutdown", async () => {
 		if (sandboxInitialized) {
 			try {
 				await SandboxManager.reset();
@@ -294,7 +294,7 @@ export default function (pi: ExtensionAPI) {
 		}
 	});
 
-	pi.registerCommand("sandbox", {
+	jesus.registerCommand("sandbox", {
 		description: "Show sandbox configuration",
 		handler: async (_args, ctx) => {
 			if (!sandboxEnabled) {

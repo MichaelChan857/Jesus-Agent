@@ -4,13 +4,13 @@
  * Demonstrates the `model_select` hook which fires when the model changes
  * via /model command, Ctrl+P cycling, or session restore.
  *
- * Usage: pi -e ./model-status.ts
+ * Usage: jesus -e ./model-status.ts
  */
 
 import type { ExtensionAPI } from "@jesus/coding-agent";
 
-export default function (pi: ExtensionAPI) {
-	pi.on("model_select", async (event, ctx) => {
+export default function (jesus: ExtensionAPI) {
+	jesus.on("model_select", async (event, ctx) => {
 		const { model, previousModel, source } = event;
 
 		// Format model identifiers
