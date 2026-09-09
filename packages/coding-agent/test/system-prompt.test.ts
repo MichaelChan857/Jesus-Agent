@@ -126,4 +126,30 @@ describe("buildSystemPrompt", () => {
 			expect(prompt.match(/- Use dynamic_tool for summaries\./g)).toHaveLength(1);
 		});
 	});
+
+	describe("identity", () => {
+		test("identifies as Jesus Agent by AI Bernoulli", () => {
+			const prompt = buildSystemPrompt({
+				selectedTools: [],
+				contextFiles: [],
+				skills: [],
+				cwd: process.cwd(),
+			});
+
+			expect(prompt).toContain("Jesus Agent by AI Bernoulli");
+			expect(prompt).toContain("Publisher: AI Bernoulli");
+		});
+
+		test("instructs model not to claim to be a product of the underlying model provider", () => {
+			const prompt = buildSystemPrompt({
+				selectedTools: [],
+				contextFiles: [],
+				skills: [],
+				cwd: process.cwd(),
+			});
+
+			expect(prompt).toContain("Never describe yourself as a product of the underlying model provider");
+			expect(prompt).toContain("Underlying language model: provided by a third-party provider");
+		});
+	});
 });
