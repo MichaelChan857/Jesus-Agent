@@ -96,6 +96,44 @@ npm install -g @jesus/coding-agent
 
 See `AGENTS.md §Releasing` for the full release process (manual local smoke, lockfile review, fail-recovery).
 
+## GitHub Actions workflows
+
+Eleven GitHub Actions workflow files live under `.github/workflows/`:
+
+`ci.yml`, `release-smoke.yml`, `build-binaries.yml`, `pr-gate.yml`,
+`npm-audit.yml`, `publish-model-catalog.yml`, `issue-gate.yml`,
+`issue-analysis.yml`, `issue-triage-labels.yml`,
+`approve-contributor.yml`, `remove-inprogress-on-close.yml`.
+
+These are tracked in the local working tree but **were not pushed to
+GitHub** during the initial `git push`, because the GitHub CLI token
+used for the first push (account `MichaelChan857` via `gh auth login`)
+does not include the `workflow` OAuth scope. GitHub rejects any push
+that would create or update files under `.github/workflows/`. The same
+rejection applies via Contents API (`PUT`) and Git Data API
+(`POST /git/trees`), so neither contents- nor data-API workarounds
+help with the current token.
+
+To enable CI on GitHub, do one of:
+
+1. **Refresh the token with workflow scope** (recommended):
+   ```bash
+   gh auth refresh -h github.com -s workflow
+   ```
+   This opens a browser confirmation page; after approval, push the
+   workflows with:
+   ```bash
+   git push origin main
+   ```
+2. **Upload via the GitHub web UI**: open
+   `https://github.com/MichaelChan857/oneself-desk/tree/main/.github/workflows/`,
+   click "Add file" → "Upload files", drop the eleven `.yml` files
+   from the local `.github/workflows/` directory, and commit.
+3. **Skip CI**: the source code is fully usable locally; CI is not
+   required for development. See `AGENTS.md §Releasing` for the
+   `npm run release:smoke` script which covers the same matrix
+   that `release-smoke.yml` would run on GitHub.
+
 ## Supply-chain hardening
 
 The build treats npm dependency changes as reviewed code changes.
