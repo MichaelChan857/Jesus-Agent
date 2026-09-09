@@ -23,6 +23,10 @@ const allowedExternalPackages = new Set([
 	"utf-8-validate",
 	// Optional debug output coloring.
 	"supports-color",
+	// OS keyring binding (spec 2026-09-08-secret-store-keytar). Native
+	// binary; not bundled. SecretStore falls back to in-memory storage
+	// when keytar is absent.
+	"keytar",
 ]);
 
 const lazyJitiPlugin = {
@@ -79,7 +83,7 @@ function commonBuildOptions() {
 		banner,
 		bundle: true,
 		define: { PI_BUNDLED_NODE: "true" },
-		external: ["@silvia-odwyer/photon-node"],
+		external: ["@silvia-odwyer/photon-node", "keytar"],
 		format: "esm",
 		legalComments: "none",
 		logLevel: "warning",
@@ -91,7 +95,7 @@ function commonBuildOptions() {
 		// package replaces it with a synchronous lazy require so jiti loads only
 		// when importing an extension; Babel remains deferred until a cache miss
 		// needs transformation.
-		plugins: [lazyJitiPlugin, httpsProxyAgentNamedExportPlugin],
+		plugins: [lazyJitiPlugin, httpsProxyAgentNamedExportPlugin, nativeNodeExternalPlugin],
 		sourcemap: false,
 		target: "node22.19",
 		// Do not apply the monorepo's source-oriented path aliases while bundling
@@ -100,6 +104,19 @@ function commonBuildOptions() {
 		tsconfigRaw: { compilerOptions: {} },
 	};
 }
+
+// Mark any imported *.node file as external (native bindings; the bundle
+// keeps the require call so Node.js resolves it at runtime from
+// node_modules/<pkg>/build/Release/...).
+const nativeNodeExternalPlugin = {
+	name: "native-node-external",
+	setup(build) {
+		build.onResolve({ filter: /\.node$/ }, (args) => ({
+			path: args.path,
+			external: true,
+		}));
+	},
+};
 
 function validateExternalImports(metafiles) {
 	const unexpected = new Set();
