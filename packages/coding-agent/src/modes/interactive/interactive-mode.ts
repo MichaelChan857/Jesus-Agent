@@ -1004,28 +1004,22 @@ export class InteractiveMode {
 				`${theme.fg("warning", "✦")} Jesus can explain its own features and look up its docs. Ask it how to use or extend Jesus.`,
 			);
 
-			// Jesus brand splash: large ASCII cross + name + slogan + tagline.
-			// Cross uses Unicode full-block characters (█) — 9 rows tall with a 12-char
-			// horizontal beam (2 rows thick) so the cross has real visual weight.
-			// Renders as plain text inside the ExpandableText so the cross logo + colored
-			// tagline stay consistent between collapsed and expanded states.
-			const CROSS_COL_WIDTH = 13;
-			const crossStem = "   ███";
-			const crossBeam = " ".repeat((CROSS_COL_WIDTH - 12) / 2) + "█".repeat(12);
-			const crossLines = [
-				crossStem,
-				crossStem,
-				crossStem,
-				crossBeam,
-				crossBeam,
-				crossStem,
-				crossStem,
-				crossStem,
-				crossStem,
-			];
-			const leftColPadded = crossLines
-				.map((row) => theme.fg("warning", row.padEnd(CROSS_COL_WIDTH, " ")))
-				.join("\n");
+			// Jesus brand splash: large ASCII cross + name + slogan + tagline,
+			// wrapped in a blue rounded-rectangle frame so the brand mark reads
+			// as one unit (Claude-Code-style banner).
+			//
+			// Cross geometry: stem = 3 blocks of █ (visual width 6) centered;
+			// beam = 13 blocks of █ (visual width 26) so the beam extends 5
+			// visual cols past the stem on each side. All cross rows are
+			// padded with spaces to the same visual width so the box frame
+			// stays aligned.
+			const CROSS_BEAM_BLOCKS = 13;
+			const CROSS_STEM_BLOCKS = 3;
+			const crossStem = `${" ".repeat((CROSS_BEAM_BLOCKS - CROSS_STEM_BLOCKS) / 2)}${"█".repeat(CROSS_STEM_BLOCKS)}${" ".repeat((CROSS_BEAM_BLOCKS - CROSS_STEM_BLOCKS) / 2)}`;
+			const crossBeam = "█".repeat(CROSS_BEAM_BLOCKS);
+			const crossLines = [crossStem, crossStem, crossStem, crossBeam, crossBeam, crossStem, crossStem, crossStem];
+			const crossVisualWidth = visibleWidth(crossBeam);
+			const crossCharWidth = crossBeam.length;
 
 			const headerName = theme.bold(theme.fg("accent", APP_NAME.toUpperCase()));
 			const headerVersion = theme.fg("dim", ` v${this.version}`);
@@ -1033,9 +1027,46 @@ export class InteractiveMode {
 			const headerSlogan = theme.fg("warning", theme.italic("— faith completes code —"));
 			const headerTagline = theme.fg("dim", "coding agent CLI · multi-provider · self-extensible");
 
-			// Two-column splash: cross on the left (fixed 13 cols), name/slogan/tagline on the right.
+			// Right column: 5 lines (logo, blank, slogan, blank, tagline) so the
+			// vertical center of the cross (rows 4-5) lines up with the slogan.
 			const rightCol = [headerLogo, "", headerSlogan, "", headerTagline].join("\n");
-			const splashArt = `${leftColPadded}${rightCol}\n`;
+
+			// Pad the right column to the same number of lines as the cross so the
+			// cross+right grid stays rectangular before wrapping in the box.
+			const crossRowCount = crossLines.length;
+			const rightLinesRaw = rightCol.split("\n");
+			while (rightLinesRaw.length < crossRowCount) rightLinesRaw.push("");
+			while (rightLinesRaw.length > crossRowCount) rightLinesRaw.pop();
+			// visibleWidth strips ANSI escape codes, so rightLinesWidth is the
+			// rendered column width of each right row, which is what we pad to.
+			const rightVisualWidth = Math.max(...rightLinesRaw.map((line) => visibleWidth(line)));
+			const padRightRow = (row: string): string => {
+				const padCount = rightVisualWidth - visibleWidth(row);
+				return padCount > 0 ? row + " ".repeat(padCount) : row;
+			};
+
+			const SIDE_GAP = 3;
+			// Inner content width = cross visual + gap + right visual.
+			// Both columns are padded to a fixed visual width, so the box frame
+			// stays aligned regardless of theme colour escapes.
+			const innerVisualWidth = crossVisualWidth + SIDE_GAP + rightVisualWidth;
+
+			const innerRows: string[] = [];
+			for (let i = 0; i < crossRowCount; i++) {
+				const crossRow = crossLines[i] ?? "";
+				const rightRow = rightLinesRaw[i] ?? "";
+				const crossPadded = theme.fg("warning", crossRow.padEnd(crossCharWidth, " "));
+				innerRows.push(crossPadded + " ".repeat(SIDE_GAP) + padRightRow(rightRow));
+			}
+
+			const frameColor = "borderAccent";
+			const frameLine = "─".repeat(innerVisualWidth + 2);
+			const topBorder = theme.fg(frameColor, `╭${frameLine}╮`);
+			const bottomBorder = theme.fg(frameColor, `╰${frameLine}╯`);
+			const emptyRow = `${theme.fg(frameColor, "│")} ${" ".repeat(innerVisualWidth)} ${theme.fg(frameColor, "│")}`;
+			const framedRows = innerRows.map((row) => `${theme.fg(frameColor, "│")} ${row} ${theme.fg(frameColor, "│")}`);
+			const framedSplash = [topBorder, emptyRow, ...framedRows, emptyRow, bottomBorder].join("\n");
+			const splashArt = `${framedSplash}\n`;
 			const splash = `${splashArt}\n${theme.fg("warning", "✠")} ${compactInstructions}\n${compactOnboarding}\n\n${onboarding}`;
 			const splashExpanded = `${splashArt}\n${theme.fg("warning", "✠")} ${expandedInstructions}\n\n${onboarding}`;
 
