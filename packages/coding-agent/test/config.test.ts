@@ -3,6 +3,7 @@ import { tmpdir } from "os";
 import { delimiter, join } from "path";
 import { afterEach, describe, expect, test } from "vitest";
 import {
+	BRAND_SERIAL,
 	detectInstallMethod,
 	findNodePackageDir,
 	getSelfUpdateCommand,
@@ -429,5 +430,20 @@ describe("detectInstallMethod", () => {
 
 		expect(getSelfUpdateCommand("@jesus/coding-agent")).toBeUndefined();
 		expect(getSelfUpdateUnavailableInstruction("@jesus/coding-agent")).toContain("the install path is not writable");
+	});
+
+	describe("BRAND_SERIAL", () => {
+		test("matches the JESUS-AIB-<version>-<6 hex> format", () => {
+			expect(BRAND_SERIAL).toMatch(/^JESUS-AIB-\d+\.\d+\.\d+-[0-9A-F]{6}$/);
+		});
+
+		test("is stable across reads in the same process", () => {
+			expect(BRAND_SERIAL).toBe(BRAND_SERIAL);
+		});
+
+		test("hex suffix is uppercase", () => {
+			const suffix = BRAND_SERIAL.split("-").pop();
+			expect(suffix).toBe(suffix?.toUpperCase());
+		});
 	});
 });

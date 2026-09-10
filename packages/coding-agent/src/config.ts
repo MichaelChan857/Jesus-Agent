@@ -536,6 +536,33 @@ export const APP_TITLE: string = appConfigName ? APP_NAME : "jesus";
 export const CONFIG_DIR_NAME: string = appConfig?.configDir || ".jesus";
 export const VERSION: string = pkg.version || "0.0.0";
 
+/**
+ * Jesus Agent brand serial — a deterministic per-version identifier that
+ * shows up in the splash so users can confirm they're running an
+ * official AI Bernoulli release rather than an unreleased or third-party
+ * fork. Format: JESUS-AIB-<version>-<6 hex chars derived from a fixed
+ * salt + version string>.
+ *
+ * NOTE: this is a *brand marker*, not a cryptographic signature. It is
+ * derived solely from VERSION so it is stable across builds of the same
+ * release and changes when VERSION changes. There is no build-time
+ * secret, so anyone can reproduce this string given the version. Its
+ * purpose is to give end users a recognisable handle to put in bug
+ * reports, not to prove provenance cryptographically.
+ */
+export const BRAND_SERIAL = (() => {
+	const version = VERSION;
+	const salt = "jesus-agent-brand-marker-v1";
+	// Tiny deterministic hash — FNV-1a 32-bit, formatted as 6 hex chars.
+	let hash = 0x811c9dc5;
+	for (let i = 0; i < (version + salt).length; i++) {
+		hash ^= (version + salt).charCodeAt(i);
+		hash = Math.imul(hash, 0x01000193) >>> 0;
+	}
+	const suffix = (hash >>> 0).toString(16).padStart(8, "0").slice(0, 6).toUpperCase();
+	return `JESUS-AIB-${version}-${suffix}`;
+})();
+
 // e.g., PI_CODING_AGENT_DIR or TAU_CODING_AGENT_DIR
 export const ENV_AGENT_DIR = `${APP_NAME.toUpperCase()}_CODING_AGENT_DIR`;
 export const ENV_SESSION_DIR = `${APP_NAME.toUpperCase()}_CODING_AGENT_SESSION_DIR`;

@@ -49,6 +49,7 @@ import { spawn } from "child_process";
 import {
 	APP_NAME,
 	APP_TITLE,
+	BRAND_SERIAL,
 	CONFIG_DIR_NAME,
 	getAgentDir,
 	getAuthPath,
@@ -1041,12 +1042,13 @@ export class InteractiveMode {
 			const headerLogo = `${headerName}${headerVersion}`;
 			const headerSlogan = theme.fg("warning", theme.italic("— faith completes code —"));
 			const headerTagline = theme.fg("dim", "coding agent CLI · multi-provider · self-extensible");
+			const headerSerial = theme.fg("dim", BRAND_SERIAL);
 
-			// Right column: 5 lines (logo, blank, slogan, blank, tagline).
-			// We vertically centre the text block inside the (taller) cross
-			// column so the words sit at the visual middle of the cross rather
-			// than crowding the top edge.
-			const rightColLines: string[] = [headerLogo, "", headerSlogan, "", headerTagline];
+			// Right column: 6 lines (logo, blank, slogan, blank, tagline,
+			// blank, brand serial). The serial sits one row below the
+			// tagline so the splash reads top-down: name → slogan →
+			// tagline → serial.
+			const rightColLines: string[] = [headerLogo, "", headerSlogan, "", headerTagline, headerSerial];
 			const crossRowCount = crossLines.length;
 			const rightLineCount = rightColLines.length;
 			const rightVerticalPaddingTop = Math.floor((crossRowCount - rightLineCount) / 2);
