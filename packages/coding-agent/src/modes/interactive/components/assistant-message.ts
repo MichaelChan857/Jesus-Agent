@@ -11,6 +11,14 @@ const OSC133_ZONE_FINAL = "\x1b]133;C\x07";
 /**
  * Component that renders a complete assistant message
  */
+function formatThinkingDuration(ms: number): string {
+	const seconds = Math.max(0, Math.floor(ms / 1000));
+	if (seconds < 60) return `${seconds}s`;
+	const minutes = Math.floor(seconds / 60);
+	const remSeconds = seconds % 60;
+	return `${minutes}m ${remSeconds}s`;
+}
+
 export class AssistantMessageComponent extends Container {
 	private contentContainer: Container;
 	private hideThinkingBlock: boolean;
@@ -21,6 +29,8 @@ export class AssistantMessageComponent extends Container {
 	private lastMessage?: AssistantMessage;
 	private hasToolCalls = false;
 	private isStreaming = false;
+	private thinkingStartMs: number | undefined = undefined;
+	private thinkingDurationMs: number | undefined = undefined;
 
 	constructor(
 		message?: AssistantMessage,
@@ -29,6 +39,7 @@ export class AssistantMessageComponent extends Container {
 		hiddenThinkingLabel = "Thought",
 		outputPad = 1,
 		markdownTransformers: readonly MarkdownTransformer[] = [],
+		thinkingDurationMs?: number,
 	) {
 		super();
 
@@ -37,6 +48,7 @@ export class AssistantMessageComponent extends Container {
 		this.hiddenThinkingLabel = hiddenThinkingLabel;
 		this.outputPad = outputPad;
 		this.markdownTransformers = markdownTransformers;
+		this.thinkingDurationMs = thinkingDurationMs;
 
 		// Container for text/thinking content
 		this.contentContainer = new Container();
@@ -70,6 +82,13 @@ export class AssistantMessageComponent extends Container {
 
 	setOutputPad(padding: number): void {
 		this.outputPad = padding;
+		if (this.lastMessage) {
+			this.updateContent(this.lastMessage);
+		}
+	}
+
+	setThinkingDurationMs(durationMs: number): void {
+		this.thinkingDurationMs = durationMs;
 		if (this.lastMessage) {
 			this.updateContent(this.lastMessage);
 		}
@@ -138,8 +157,14 @@ export class AssistantMessageComponent extends Container {
 
 				if (this.hideThinkingBlock) {
 					// Show one static label for each run of thinking blocks when hidden.
+					// If we have a measured thinking duration, append it in Claude Code
+					// style: "Thought for 1m 2s".
+					const labelText =
+						this.thinkingDurationMs !== undefined
+							? `Thought for ${formatThinkingDuration(this.thinkingDurationMs)}`
+							: this.hiddenThinkingLabel;
 					this.contentContainer.addChild(
-						new Text(theme.italic(theme.fg("thinkingText", this.hiddenThinkingLabel)), this.outputPad, 0),
+						new Text(theme.italic(theme.fg("thinkingText", labelText)), this.outputPad, 0),
 					);
 				} else {
 					// Render each run of thinking blocks as one Markdown section.

@@ -87,8 +87,40 @@ describe("AssistantMessageComponent", () => {
 		);
 		const rendered = stripAnsi(component.render(80).join("\n"));
 
-		expect(rendered.match(/Thinking\.\.\./g)).toHaveLength(1);
+		expect(rendered.match(/Thought/g)).toHaveLength(1);
 		expect(rendered).toContain("answer");
+	});
+
+	test("appends measured thinking duration to the hidden label", () => {
+		initTheme("dark");
+
+		const component = new AssistantMessageComponent(
+			createAssistantMessage([
+				{ type: "thinking", thinking: "first thought" },
+				{ type: "text", text: "answer" },
+			]),
+			true,
+		);
+		component.setThinkingDurationMs(62_000);
+		const rendered = stripAnsi(component.render(80).join("\n"));
+
+		expect(rendered).toContain("Thought for 1m 2s");
+	});
+
+	test("formats short thinking duration in seconds", () => {
+		initTheme("dark");
+
+		const component = new AssistantMessageComponent(
+			createAssistantMessage([
+				{ type: "thinking", thinking: "quick" },
+				{ type: "text", text: "x" },
+			]),
+			true,
+		);
+		component.setThinkingDurationMs(7_500);
+		const rendered = stripAnsi(component.render(80).join("\n"));
+
+		expect(rendered).toContain("Thought for 7s");
 	});
 
 	test("uses configured output padding for text and thinking", () => {
