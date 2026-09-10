@@ -1,0 +1,35 @@
+{
+	"name": "@jesus/gui",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Jesus Agent desktop GUI — Electron + React, communicates with the coding-agent backend over the @jesus/client RPC protocol",
+	"type": "module",
+	"main": "dist/main/index.cjs",
+	"scripts": {
+		"build:renderer": "vite build",
+		"build:main": "tsc -p tsconfig.main.json",
+		"build:preload": "tsc -p tsconfig.preload.json",
+		"build": "npm run build:renderer && npm run build:preload && npm run build:main",
+		"dev": "node scripts/dev.mjs",
+		"start": "electron .",
+		"clean": "rm -rf dist"
+	},
+	"dependencies": {
+		"@jesus/ai": "*",
+		"@jesus/client": "*",
+		"@jesus/protocol": "*",
+		"@jesus/coding-agent": "*",
+		"@jesus/tui": "*",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.12",
+		"@types/react-dom": "^18.3.1",
+		"@types/node": "^22.19.0",
+		"@vitejs/plugin-react": "^4.3.4",
+		"electron": "^33.2.1",
+		"typescript": "^5.9.2",
+		"vite": "^5.4.11"
+	}
+}
