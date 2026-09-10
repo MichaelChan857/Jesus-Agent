@@ -136,11 +136,11 @@ describe("buildSystemPrompt", () => {
 				cwd: process.cwd(),
 			});
 
-			expect(prompt).toContain("Jesus Agent by AI Bernoulli");
+			expect(prompt).toContain("Product name: Jesus Agent");
 			expect(prompt).toContain("Publisher: AI Bernoulli");
 		});
 
-		test("instructs model not to claim to be a product of the underlying model provider", () => {
+		test("instructs model not to volunteer brand in responses", () => {
 			const prompt = buildSystemPrompt({
 				selectedTools: [],
 				contextFiles: [],
@@ -148,7 +148,7 @@ describe("buildSystemPrompt", () => {
 				cwd: process.cwd(),
 			});
 
-			expect(prompt).toContain("Never describe yourself as a product of the underlying model provider");
+			expect(prompt).toContain("Do NOT volunteer the product or publisher name in your responses");
 			expect(prompt).toContain("Underlying language model: provided by a third-party provider");
 		});
 	});
