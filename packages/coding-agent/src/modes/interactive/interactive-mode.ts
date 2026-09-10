@@ -1019,11 +1019,11 @@ export class InteractiveMode {
 			//     13-row block, matching the right-column vertical centring
 			// All rows are padded to the same visual width by the box-frame
 			// code below so the splash banner stays rectangular.
-			const CROSS_BEAM_BLOCKS = 11;
-			const CROSS_STEM_BLOCKS = 4;
-			const CROSS_BEAM_THICKNESS = 2;
+			const CROSS_BEAM_BLOCKS = 17;
+			const CROSS_STEM_BLOCKS = 2;
+			const CROSS_BEAM_THICKNESS = 1;
 			const CROSS_ROWS_ABOVE_BEAM = 4;
-			const CROSS_ROWS_BELOW_BEAM = 11;
+			const CROSS_ROWS_BELOW_BEAM = 12;
 			const crossStem = `${" ".repeat((CROSS_BEAM_BLOCKS - CROSS_STEM_BLOCKS) / 2)}${"█".repeat(CROSS_STEM_BLOCKS)}${" ".repeat((CROSS_BEAM_BLOCKS - CROSS_STEM_BLOCKS) / 2)}`;
 			const crossBeam = "█".repeat(CROSS_BEAM_BLOCKS);
 			const crossLines: string[] = [
