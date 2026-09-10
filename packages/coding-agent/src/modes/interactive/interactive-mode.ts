@@ -1019,7 +1019,6 @@ export class InteractiveMode {
 			//     13-row block, matching the right-column vertical centring
 			// All rows are padded to the same visual width by the box-frame
 			// code below so the splash banner stays rectangular.
-			const CROSS_BEAM_BLOCKS = 13;
 			const CROSS_BEAM_THICKNESS = 1;
 			const CROSS_ROWS_ABOVE_BEAM = 4;
 			const CROSS_ROWS_BELOW_BEAM = 9;
@@ -1028,8 +1027,8 @@ export class InteractiveMode {
 			// centre coincides with the beam's visual centre. (Previously the
 			// stem had hard-coded 5-space padding baked into the string, which
 			// caused the stem to land 5 cols right of the beam's start.)
-			const crossStem = "██";
-			const crossBeam = "█".repeat(CROSS_BEAM_BLOCKS);
+			const crossStem = "│";
+			const crossBeam = "──────┼──────";
 			const crossLines: string[] = [
 				...Array(CROSS_ROWS_ABOVE_BEAM).fill(crossStem),
 				...Array(CROSS_BEAM_THICKNESS).fill(crossBeam),
