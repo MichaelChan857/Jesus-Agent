@@ -462,6 +462,13 @@ export class InteractiveMode {
 	private readonly defaultWorkingMessage = "Reasoning...";
 	private readonly defaultHiddenThinkingLabel = "Thinking...";
 	private hiddenThinkingLabel = this.defaultHiddenThinkingLabel;
+	// Brand spinner for the Reasoning/working status line. Cycles
+	// cross + spark glyphs every 80ms. Extensions can still override
+	// via setWorkingIndicator(); this only kicks in when the extension
+	// (or the user) hasn't set a custom indicator.
+	private static readonly DEFAULT_WORKING_INDICATOR: WorkingIndicatorOptions = {
+		frames: ["✝", "✦", "✝", "✧", "✝"],
+	};
 
 	private lastSigintTime = 0;
 	private lastEscapeTime = 0;
@@ -2295,7 +2302,7 @@ export class InteractiveMode {
 			new WorkingStatusIndicator(
 				this.ui,
 				this.workingMessage ?? this.defaultWorkingMessage,
-				this.workingIndicatorOptions,
+				this.workingIndicatorOptions ?? InteractiveMode.DEFAULT_WORKING_INDICATOR,
 			),
 		);
 	}
