@@ -1004,20 +1004,31 @@ export class InteractiveMode {
 				`${theme.fg("warning", "✦")} Jesus can explain its own features and look up its docs. Ask it how to use or extend Jesus.`,
 			);
 
-			// Jesus brand splash: large ASCII cross + name + slogan + tagline,
-			// wrapped in a blue rounded-rectangle frame so the brand mark reads
-			// as one unit (Claude-Code-style banner).
+			// Jesus brand splash: ASCII cross + name + slogan + tagline, wrapped
+			// in a blue rounded-rectangle frame so the brand mark reads as one
+			// unit (Claude-Code-style banner).
 			//
-			// Cross geometry: stem = 3 blocks of █ (visual width 6) centered;
-			// beam = 13 blocks of █ (visual width 26) so the beam extends 5
-			// visual cols past the stem on each side. All cross rows are
-			// padded with spaces to the same visual width so the box frame
-			// stays aligned.
+			// Cross geometry follows the Greek (equal-arm) cross proportion:
+			//   - stem is 6 blocks of █ wide (visual 12 cols)
+			//   - beam is 13 blocks of █ wide (visual 26 cols) so the beam
+			//     extends ~3.5 visual cols past the stem on each side
+			//   - beam thickness = 3 rows ≈ visual 6 cols (half the stem width)
+			//   - vertical arm = 13 rows total: 5 above the beam, 5 below,
+			//     plus the 3 beam rows in the middle — equal-arm cross
+			//   - all cross rows are padded with spaces to the same visual
+			//     width so the box frame stays aligned
 			const CROSS_BEAM_BLOCKS = 13;
-			const CROSS_STEM_BLOCKS = 3;
+			const CROSS_STEM_BLOCKS = 6;
+			const CROSS_BEAM_THICKNESS = 3;
+			const CROSS_ROWS_ABOVE_BEAM = 5;
+			const CROSS_ROWS_BELOW_BEAM = 5;
 			const crossStem = `${" ".repeat((CROSS_BEAM_BLOCKS - CROSS_STEM_BLOCKS) / 2)}${"█".repeat(CROSS_STEM_BLOCKS)}${" ".repeat((CROSS_BEAM_BLOCKS - CROSS_STEM_BLOCKS) / 2)}`;
 			const crossBeam = "█".repeat(CROSS_BEAM_BLOCKS);
-			const crossLines = [crossStem, crossStem, crossStem, crossBeam, crossBeam, crossStem, crossStem, crossStem];
+			const crossLines: string[] = [
+				...Array(CROSS_ROWS_ABOVE_BEAM).fill(crossStem),
+				...Array(CROSS_BEAM_THICKNESS).fill(crossBeam),
+				...Array(CROSS_ROWS_BELOW_BEAM).fill(crossStem),
+			];
 			const crossVisualWidth = visibleWidth(crossBeam);
 			const crossCharWidth = crossBeam.length;
 
@@ -1027,16 +1038,19 @@ export class InteractiveMode {
 			const headerSlogan = theme.fg("warning", theme.italic("— faith completes code —"));
 			const headerTagline = theme.fg("dim", "coding agent CLI · multi-provider · self-extensible");
 
-			// Right column: 5 lines (logo, blank, slogan, blank, tagline) so the
-			// vertical center of the cross (rows 4-5) lines up with the slogan.
-			const rightCol = [headerLogo, "", headerSlogan, "", headerTagline].join("\n");
-
-			// Pad the right column to the same number of lines as the cross so the
-			// cross+right grid stays rectangular before wrapping in the box.
+			// Right column: 5 lines (logo, blank, slogan, blank, tagline).
+			// We vertically centre the text block inside the (much taller) cross
+			// column so the words sit at the visual middle of the cross rather
+			// than crowding the top edge.
+			const rightColLines: string[] = [headerLogo, "", headerSlogan, "", headerTagline];
 			const crossRowCount = crossLines.length;
-			const rightLinesRaw = rightCol.split("\n");
-			while (rightLinesRaw.length < crossRowCount) rightLinesRaw.push("");
-			while (rightLinesRaw.length > crossRowCount) rightLinesRaw.pop();
+			const rightLineCount = rightColLines.length;
+			const rightVerticalPaddingTop = Math.floor((crossRowCount - rightLineCount) / 2);
+			const rightLinesRaw: string[] = [
+				...Array(rightVerticalPaddingTop).fill(""),
+				...rightColLines,
+				...Array(crossRowCount - rightVerticalPaddingTop - rightLineCount).fill(""),
+			];
 			// visibleWidth strips ANSI escape codes, so rightLinesWidth is the
 			// rendered column width of each right row, which is what we pad to.
 			const rightVisualWidth = Math.max(...rightLinesRaw.map((line) => visibleWidth(line)));
