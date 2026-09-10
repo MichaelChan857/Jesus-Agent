@@ -1054,10 +1054,16 @@ export class InteractiveMode {
 			];
 			// visibleWidth strips ANSI escape codes, so rightLinesWidth is the
 			// rendered column width of each right row, which is what we pad to.
+			// We centre-align every row on the same axis so short lines (JESUS)
+			// and long lines (tagline) line up around their visual middle.
 			const rightVisualWidth = Math.max(...rightLinesRaw.map((line) => visibleWidth(line)));
 			const padRightRow = (row: string): string => {
-				const padCount = rightVisualWidth - visibleWidth(row);
-				return padCount > 0 ? row + " ".repeat(padCount) : row;
+				const rowWidth = visibleWidth(row);
+				const padCount = rightVisualWidth - rowWidth;
+				if (padCount <= 0) return row;
+				const left = Math.floor(padCount / 2);
+				const right = padCount - left;
+				return " ".repeat(left) + row + " ".repeat(right);
 			};
 
 			const SIDE_GAP = 3;
