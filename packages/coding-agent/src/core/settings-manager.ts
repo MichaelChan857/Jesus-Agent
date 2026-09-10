@@ -934,7 +934,7 @@ export class SettingsManager {
 	}
 
 	getHideThinkingBlock(): boolean {
-		return this.settings.hideThinkingBlock ?? false;
+		return this.settings.hideThinkingBlock ?? true;
 	}
 
 	getShowCacheMissNotices(): boolean {
