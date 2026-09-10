@@ -467,7 +467,7 @@ export class InteractiveMode {
 	// via setWorkingIndicator(); this only kicks in when the extension
 	// (or the user) hasn't set a custom indicator.
 	private static readonly DEFAULT_WORKING_INDICATOR: WorkingIndicatorOptions = {
-		frames: ["✝", "✦", "✝", "✧", "✝"],
+		frames: ["✶", "✷", "✺"],
 	};
 
 	private lastSigintTime = 0;
