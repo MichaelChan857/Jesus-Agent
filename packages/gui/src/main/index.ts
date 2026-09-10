@@ -22,11 +22,18 @@ import { app, BrowserWindow, type IpcMainInvokeEvent, ipcMain, shell } from "ele
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Resolve paths relative to this source file's directory. In dev
+// (tsx running src/main/index.ts) __dirname is src/main, so the
+// preload lives at ../../dist/preload/index.cjs (built by
+// scripts/dev.mjs before electron starts). In production __dirname
+// is dist/main and the same relative path points at dist/preload.
+const PRELOAD_PATH = join(__dirname, "../../dist/preload/index.cjs");
+const RENDERER_DIST = resolve(__dirname, "../renderer/index.html");
+
 const RENDERER_DEV_URL = process.env.JESUS_GUI_RENDERER_URL ?? "http://localhost:5173";
 const IS_DEV = !app.isPackaged;
 const REPO_ROOT = resolve(__dirname, "../../../..");
 const CODING_AGENT_DIR = resolve(REPO_ROOT, "packages/coding-agent");
-const RENDERER_DIST = resolve(__dirname, "../renderer/index.html");
 
 let mainWindow: BrowserWindow | null = null;
 let backendProc: ChildProcess | null = null;
@@ -42,10 +49,15 @@ function createWindow(): void {
 		backgroundColor: "#0d1b2a",
 		show: false,
 		webPreferences: {
-			preload: join(__dirname, "../preload/index.cjs"),
+			preload: PRELOAD_PATH,
 			contextIsolation: true,
 			nodeIntegration: false,
-			sandbox: true,
+			// Sandbox mode forces the preload to run as CommonJS only.
+			// We turn sandbox off so tsx can load a .ts preload during dev;
+			// production builds compile the preload to .cjs first so sandbox
+			// can be re-enabled for shipping. Keep this in sync with the
+			// dev script and the production build.
+			sandbox: !IS_DEV,
 		},
 	});
 
