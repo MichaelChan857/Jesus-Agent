@@ -1004,33 +1004,37 @@ export class InteractiveMode {
 				`${theme.fg("warning", "✦")} Jesus can explain its own features and look up its docs. Ask it how to use or extend Jesus.`,
 			);
 
-			// Jesus brand splash: ASCII cross + name + slogan + tagline, wrapped
+			// Jesus brand splash: ASCII crown + name + slogan + tagline, wrapped
 			// in a blue rounded-rectangle frame so the brand mark reads as one
 			// unit (Claude-Code-style banner).
 			//
-			// Cross geometry follows the Greek (equal-arm) cross proportion:
-			//   - stem is 6 blocks of █ wide (visual 12 cols)
-			//   - beam is 13 blocks of █ wide (visual 26 cols) so the beam
-			//     extends ~3.5 visual cols past the stem on each side
-			//   - beam thickness = 3 rows ≈ visual 6 cols (half the stem width)
-			//   - vertical arm = 13 rows total: 5 above the beam, 5 below,
-			//     plus the 3 beam rows in the middle — equal-arm cross
-			//   - all cross rows are padded with spaces to the same visual
-			//     width so the box frame stays aligned
-			const CROSS_BEAM_BLOCKS = 13;
-			const CROSS_STEM_BLOCKS = 6;
-			const CROSS_BEAM_THICKNESS = 3;
-			const CROSS_ROWS_ABOVE_BEAM = 5;
-			const CROSS_ROWS_BELOW_BEAM = 5;
-			const crossStem = `${" ".repeat((CROSS_BEAM_BLOCKS - CROSS_STEM_BLOCKS) / 2)}${"█".repeat(CROSS_STEM_BLOCKS)}${" ".repeat((CROSS_BEAM_BLOCKS - CROSS_STEM_BLOCKS) / 2)}`;
-			const crossBeam = "█".repeat(CROSS_BEAM_BLOCKS);
-			const crossLines: string[] = [
-				...Array(CROSS_ROWS_ABOVE_BEAM).fill(crossStem),
-				...Array(CROSS_BEAM_THICKNESS).fill(crossBeam),
-				...Array(CROSS_ROWS_BELOW_BEAM).fill(crossStem),
+			// Crown geometry (13 rows tall, all unicode 1-visual-col except ▓
+			// which is 2):
+			//   - row 1-5: 3 diamond gems on top + 3 peaks (╱╲ strokes) tapering
+			//     up from a wider base
+			//   - row 6-8: solid band (▓), 16 cells wide → visual 32 cols
+			//   - row 9: tapered band with one-cell padding on each side
+			//   - row 10: bottom edge using rounded-corner box drawing
+			//   - row 11-13: padding so the crown is the same height as a
+			//     13-row block, matching the right-column vertical centring
+			// All rows are padded to the same visual width by the box-frame
+			// code below so the splash banner stays rectangular.
+			const crownLines: string[] = [
+				"       ◆◆◆       ",
+				"     ╱╲  ╱╲      ",
+				"   ╱╲  ╱╲  ╱╲    ",
+				"  ╱  ╲╱  ╲╱  ╲   ",
+				" ╱    ╱    ╲     ",
+				"▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓",
+				"▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓",
+				"▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓",
+				" ▓▓▓▓▓▓▓▓▓▓▓▓▓  ",
+				"  ╰▓▓▓▓▓▓▓▓╯   ",
+				"",
+				"",
+				"",
 			];
-			const crossVisualWidth = visibleWidth(crossBeam);
-			const crossCharWidth = crossBeam.length;
+			const crownVisualWidth = Math.max(...crownLines.map((row) => visibleWidth(row)));
 
 			const headerName = theme.bold(theme.fg("accent", APP_NAME.toUpperCase()));
 			const headerVersion = theme.fg("dim", ` v${this.version}`);
@@ -1039,17 +1043,17 @@ export class InteractiveMode {
 			const headerTagline = theme.fg("dim", "coding agent CLI · multi-provider · self-extensible");
 
 			// Right column: 5 lines (logo, blank, slogan, blank, tagline).
-			// We vertically centre the text block inside the (much taller) cross
-			// column so the words sit at the visual middle of the cross rather
+			// We vertically centre the text block inside the (taller) crown
+			// column so the words sit at the visual middle of the crown rather
 			// than crowding the top edge.
 			const rightColLines: string[] = [headerLogo, "", headerSlogan, "", headerTagline];
-			const crossRowCount = crossLines.length;
+			const crownRowCount = crownLines.length;
 			const rightLineCount = rightColLines.length;
-			const rightVerticalPaddingTop = Math.floor((crossRowCount - rightLineCount) / 2);
+			const rightVerticalPaddingTop = Math.floor((crownRowCount - rightLineCount) / 2);
 			const rightLinesRaw: string[] = [
 				...Array(rightVerticalPaddingTop).fill(""),
 				...rightColLines,
-				...Array(crossRowCount - rightVerticalPaddingTop - rightLineCount).fill(""),
+				...Array(crownRowCount - rightVerticalPaddingTop - rightLineCount).fill(""),
 			];
 			// visibleWidth strips ANSI escape codes, so rightLinesWidth is the
 			// rendered column width of each right row, which is what we pad to.
@@ -1060,17 +1064,25 @@ export class InteractiveMode {
 			};
 
 			const SIDE_GAP = 3;
-			// Inner content width = cross visual + gap + right visual.
+			// Inner content width = crown visual + gap + right visual.
 			// Both columns are padded to a fixed visual width, so the box frame
 			// stays aligned regardless of theme colour escapes.
-			const innerVisualWidth = crossVisualWidth + SIDE_GAP + rightVisualWidth;
+			const innerVisualWidth = crownVisualWidth + SIDE_GAP + rightVisualWidth;
+
+			// Pad each crown row to the same visual width so the box frame
+			// stays rectangular. We use visibleWidth because ▓ is double-wide
+			// while ╱╲◆ are 1 visual col.
+			const padCrownRow = (row: string): string => {
+				const padCount = crownVisualWidth - visibleWidth(row);
+				return padCount > 0 ? row + " ".repeat(padCount) : row;
+			};
 
 			const innerRows: string[] = [];
-			for (let i = 0; i < crossRowCount; i++) {
-				const crossRow = crossLines[i] ?? "";
+			for (let i = 0; i < crownRowCount; i++) {
+				const crownRow = crownLines[i] ?? "";
 				const rightRow = rightLinesRaw[i] ?? "";
-				const crossPadded = theme.fg("warning", crossRow.padEnd(crossCharWidth, " "));
-				innerRows.push(crossPadded + " ".repeat(SIDE_GAP) + padRightRow(rightRow));
+				const crownPadded = theme.fg("warning", padCrownRow(crownRow));
+				innerRows.push(crownPadded + " ".repeat(SIDE_GAP) + padRightRow(rightRow));
 			}
 
 			const frameColor = "borderAccent";
