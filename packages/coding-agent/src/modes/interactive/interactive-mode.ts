@@ -1020,11 +1020,15 @@ export class InteractiveMode {
 			// All rows are padded to the same visual width by the box-frame
 			// code below so the splash banner stays rectangular.
 			const CROSS_BEAM_BLOCKS = 13;
-			const CROSS_STEM_BLOCKS = 2;
 			const CROSS_BEAM_THICKNESS = 1;
 			const CROSS_ROWS_ABOVE_BEAM = 4;
 			const CROSS_ROWS_BELOW_BEAM = 9;
-			const crossStem = `${" ".repeat((CROSS_BEAM_BLOCKS - CROSS_STEM_BLOCKS) / 2)}${"█".repeat(CROSS_STEM_BLOCKS)}${" ".repeat((CROSS_BEAM_BLOCKS - CROSS_STEM_BLOCKS) / 2)}`;
+			// Cross stem is bare "██" — padCrossRow() below is responsible for
+			// adding the leading and trailing padding so the stem's visual
+			// centre coincides with the beam's visual centre. (Previously the
+			// stem had hard-coded 5-space padding baked into the string, which
+			// caused the stem to land 5 cols right of the beam's start.)
+			const crossStem = "██";
 			const crossBeam = "█".repeat(CROSS_BEAM_BLOCKS);
 			const crossLines: string[] = [
 				...Array(CROSS_ROWS_ABOVE_BEAM).fill(crossStem),
@@ -1073,11 +1077,17 @@ export class InteractiveMode {
 			const innerVisualWidth = crossVisualWidth + SIDE_GAP + rightVisualWidth;
 
 			// Pad each cross row to the same visual width so the box frame
-			// stays rectangular. We use visibleWidth because ▓ is double-wide
-			// while ╱╲◆ are 1 visual col.
+			// stays rectangular. The stem is naturally narrower than the
+			// beam (in visual cols), so we centre the stem within the
+			// beam width — split the slack evenly between left and right.
+			// We use visibleWidth because ▓ is double-wide while ╱╲◆ are
+			// 1 visual col.
 			const padCrossRow = (row: string): string => {
 				const padCount = crossVisualWidth - visibleWidth(row);
-				return padCount > 0 ? row + " ".repeat(padCount) : row;
+				if (padCount <= 0) return row;
+				const left = Math.ceil(padCount / 2);
+				const right = padCount - left;
+				return " ".repeat(left) + row + " ".repeat(right);
 			};
 
 			const innerRows: string[] = [];
